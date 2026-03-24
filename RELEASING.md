@@ -1,7 +1,7 @@
 # Releasing Smart Domain
 
-Smart Domain publishes to Maven Central through the Sonatype Central Publisher Portal compatibility
-endpoint.
+Smart Domain publishes to Maven Central through the Sonatype Central Publisher Portal API by
+uploading a deployment bundle.
 
 ## One-Time Setup
 
@@ -36,7 +36,7 @@ export GPG_PRIVATE_KEY="$(cat private.asc)"
 export GPG_PASSPHRASE=...
 
 cd smart-domain
-./gradlew --no-parallel -PsmartDomainVersion=0.1.0 publishReleaseToCentral
+./gradlew --no-parallel -PsmartDomainVersion=0.1.0 publishReleaseBundle
 ```
 
 ## GitHub Release Flow
@@ -47,13 +47,15 @@ release workflow is run manually.
 It performs:
 
 1. `./gradlew build`
-2. `./gradlew --no-parallel publishReleaseToCentral`
+2. `./gradlew --no-parallel publishReleaseBundle`
+3. Generates checksums and zips the published repository layout
+4. Uploads the bundle to `https://central.sonatype.com/api/v1/publisher/upload`
+5. Polls deployment status until `PUBLISHED`
 
 ## Notes
 
 - Maven Central requires sources jars, javadoc jars, signatures, and complete POM metadata.
 - Maven Central does not accept `-SNAPSHOT` versions as releases.
-- The release build now uses `gradle-nexus/publish-plugin`, which Sonatype lists as compatible
-  with the OSSRH staging compatibility API.
-- `stagingProfileId` is pinned to `io.github.jayclock` so the staging service does not need to
-  infer the namespace from the uploaded `groupId`.
+- The uploaded bundle uses Maven repository layout and contains signatures plus checksum files.
+- Gradle module metadata files are excluded from the bundle because the Portal upload flow only
+  needs the canonical Maven release artifacts.

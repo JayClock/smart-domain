@@ -231,6 +231,12 @@ if (project == rootProject) {
                     configureSmartDomainPom(delegate, metadata)
                 }
             }
+            repositories {
+                maven {
+                    name = 'bundle'
+                    url = rootProject.layout.buildDirectory.dir('central-bundle/repository')
+                }
+            }
         }
 
         configureSigning(project)
@@ -267,6 +273,12 @@ if (project == rootProject) {
                     configureSmartDomainPom(delegate, smartDomainCoordinates[path])
                 }
             }
+            repositories {
+                maven {
+                    name = 'bundle'
+                    url = rootProject.layout.buildDirectory.dir('central-bundle/repository')
+                }
+            }
         }
 
         configureSigning(project)
@@ -288,6 +300,16 @@ if (project == rootProject) {
         ':mybatis-spring-boot-starter:publishToSonatype',
         ':bom:publishToSonatype'
     ]
+    def bundlePublishTaskPaths = [
+        ':core:publishMavenJavaPublicationToBundleRepository',
+        ':api-hateoas:publishMavenJavaPublicationToBundleRepository',
+        ':api-jersey:publishMavenJavaPublicationToBundleRepository',
+        ':api-spring-boot-starter:publishMavenJavaPublicationToBundleRepository',
+        ':persistence:publishMavenJavaPublicationToBundleRepository',
+        ':mybatis:publishMavenJavaPublicationToBundleRepository',
+        ':mybatis-spring-boot-starter:publishMavenJavaPublicationToBundleRepository',
+        ':bom:publishMavenBomPublicationToBundleRepository'
+    ]
 
     tasks.named('closeAndReleaseSonatypeStagingRepository').configure {
         mustRunAfter(sonatypePublishTaskPaths)
@@ -298,6 +320,12 @@ if (project == rootProject) {
         description = 'Publish and release all Smart Domain modules to Maven Central via the Sonatype staging compatibility API.'
         dependsOn(sonatypePublishTaskPaths)
         dependsOn('closeAndReleaseSonatypeStagingRepository')
+    }
+
+    tasks.register('publishReleaseBundle') {
+        group = 'publishing'
+        description = 'Publish all Smart Domain modules to the local bundle repository for Central Portal API uploads.'
+        dependsOn(bundlePublishTaskPaths)
     }
 } else {
     description = 'Smart Domain product root'

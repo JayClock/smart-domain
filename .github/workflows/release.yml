@@ -48,36 +48,6 @@ jobs:
       - name: Make Gradle wrapper executable
         run: chmod +x gradlew
 
-      - name: Drop failed Central staging repositories
-        env:
-          CENTRAL_TOKEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
-          CENTRAL_TOKEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
-        shell: bash
-        run: |
-          AUTH=$(printf '%s:%s' "${CENTRAL_TOKEN_USERNAME}" "${CENTRAL_TOKEN_PASSWORD}" | base64 | tr -d '\n')
-          RESPONSE=$(curl --fail --silent --show-error \
-            --header "Authorization: Bearer ${AUTH}" \
-            "https://ossrh-staging-api.central.sonatype.com/manual/search/repositories?ip=any")
-          if [ -z "${RESPONSE}" ]; then
-            echo "No failed or open Central repositories to drop."
-            exit 0
-          fi
-          REPOSITORIES=$(RESPONSE="${RESPONSE}" python3 -c 'import json, os; data = json.loads(os.environ["RESPONSE"]); repos = data.get("repositories", data if isinstance(data, list) else []); [print(repo.get("key")) for repo in repos if repo.get("key") and str(repo.get("state", "")).lower() != "released"]')
-
-          if [ -z "${REPOSITORIES}" ]; then
-            echo "No failed or open Central repositories to drop."
-            exit 0
-          fi
-
-          while IFS= read -r repository; do
-            [ -z "${repository}" ] && continue
-            echo "Dropping stale Central repository ${repository}"
-            curl --fail --silent --show-error \
-              --request DELETE \
-              --header "Authorization: Bearer ${AUTH}" \
-              "https://ossrh-staging-api.central.sonatype.com/manual/drop/repository/${repository}"
-          done <<< "${REPOSITORIES}"
-
       - name: Build release
         env:
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_PRIVATE_KEY }}
@@ -91,4 +61,69 @@ jobs:
           ./gradlew \
             --no-parallel \
             -PsmartDomainVersion=${{ steps.version.outputs.value }} \
-            publishReleaseToCentral
+            publishReleaseBundle
+
+      - name: Upload release bundle
+        env:
+          CENTRAL_TOKEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
+          CENTRAL_TOKEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
+        shell: bash
+        run: |
+          VERSION="${{ steps.version.outputs.value }}"
+          AUTH=$(printf '%s:%s' "${CENTRAL_TOKEN_USERNAME}" "${CENTRAL_TOKEN_PASSWORD}" | base64 | tr -d '\n')
+          BUNDLE_ROOT="${GITHUB_WORKSPACE}/build/central-bundle/repository"
+          BUNDLE_FILE="${GITHUB_WORKSPACE}/build/central-bundle/central-bundle-${VERSION}.zip"
+
+          find "${BUNDLE_ROOT}" -type f \( \
+            -name 'maven-metadata.xml*' -o \
+            -name '*.module' -o \
+            -name '*.module.asc' -o \
+            -name '*.module.md5' -o \
+            -name '*.module.sha1' -o \
+            -name '*.module.sha256' -o \
+            -name '*.module.sha512' \
+          \) -delete
+
+          while IFS= read -r -d '' file; do
+            md5sum "${file}" | awk '{print $1}' > "${file}.md5"
+            sha1sum "${file}" | awk '{print $1}' > "${file}.sha1"
+            sha256sum "${file}" | awk '{print $1}' > "${file}.sha256"
+            sha512sum "${file}" | awk '{print $1}' > "${file}.sha512"
+          done < <(find "${BUNDLE_ROOT}" -type f ! -name '*.md5' ! -name '*.sha1' ! -name '*.sha256' ! -name '*.sha512' -print0)
+
+          rm -f "${BUNDLE_FILE}"
+          (
+            cd "${BUNDLE_ROOT}"
+            zip -r "${BUNDLE_FILE}" .
+          )
+
+          DEPLOYMENT_ID=$(curl --fail --silent --show-error \
+            --request POST \
+            --header "Authorization: Bearer ${AUTH}" \
+            --form "bundle=@${BUNDLE_FILE}" \
+            "https://central.sonatype.com/api/v1/publisher/upload?name=smart-domain-${VERSION}&publishingType=AUTOMATIC")
+
+          echo "Deployment ID: ${DEPLOYMENT_ID}"
+
+          for attempt in $(seq 1 40); do
+            STATUS_JSON=$(curl --fail --silent --show-error \
+              --request POST \
+              --header "Authorization: Bearer ${AUTH}" \
+              "https://central.sonatype.com/api/v1/publisher/status?id=${DEPLOYMENT_ID}")
+            STATE=$(printf '%s' "${STATUS_JSON}" | python3 -c 'import json, sys; print(json.load(sys.stdin)["deploymentState"])')
+            echo "Attempt ${attempt}: deployment state is ${STATE}"
+
+            if [ "${STATE}" = "PUBLISHED" ]; then
+              exit 0
+            fi
+
+            if [ "${STATE}" = "FAILED" ]; then
+              echo "${STATUS_JSON}"
+              exit 1
+            fi
+
+            sleep 15
+          done
+
+          echo "Timed out waiting for Central deployment to publish."
+          exit 1
