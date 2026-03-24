@@ -1,0 +1,10 @@
+group = 'io.github.jayclock.smartdomain'
+
+base {
+    archivesName = 'smart-domain-core'
+}
+
+dependencies {
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}

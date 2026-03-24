@@ -1,0 +1,23 @@
+allprojects {
+    group = 'io.github.jayclock.smartdomain.samples'
+    version = '0.1.0-SNAPSHOT'
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(17)
+        }
+    }
+
+    tasks.named('test') {
+        useJUnitPlatform()
+    }
+}

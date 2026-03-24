@@ -1,0 +1,17 @@
+group = 'io.github.jayclock.smartdomain'
+
+base {
+    archivesName = 'smart-domain-mybatis-spring-boot-starter'
+}
+
+dependencies {
+    implementation project(':backend:core')
+    implementation project(':backend:persistent:smart-domain-persistence')
+    implementation project(':backend:persistent:smart-domain-mybatis')
+    implementation 'org.springframework.boot:spring-boot-autoconfigure'
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4'
+    implementation 'jakarta.inject:jakarta.inject-api'
+
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}

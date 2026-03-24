@@ -1,0 +1,44 @@
+package io.github.jayclock.smartdomain.mybatis.support;
+
+import io.github.jayclock.smartdomain.core.InternalApi;
+import java.util.List;
+import org.apache.ibatis.reflection.factory.DefaultObjectFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+
+/** Internal object factory that lets MyBatis-created adapters participate in Spring autowiring. */
+@InternalApi
+public class InjectableObjectFactory extends DefaultObjectFactory
+    implements ApplicationContextAware {
+
+  private ApplicationContext context;
+
+  @Override
+  public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    this.context = applicationContext;
+  }
+
+  @Override
+  public <T> T create(Class<T> type) {
+    T object = super.create(type);
+    ApplicationContext contextToUse =
+        this.context != null ? this.context : ApplicationContextHolder.getApplicationContext();
+    if (contextToUse != null) {
+      contextToUse.getAutowireCapableBeanFactory().autowireBean(object);
+    }
+    return object;
+  }
+
+  @Override
+  public <T> T create(
+      Class<T> type, List<Class<?>> constructorArgTypes, List<Object> constructorArgs) {
+    T object = super.create(type, constructorArgTypes, constructorArgs);
+    ApplicationContext contextToUse =
+        this.context != null ? this.context : ApplicationContextHolder.getApplicationContext();
+    if (contextToUse != null) {
+      contextToUse.getAutowireCapableBeanFactory().autowireBean(object);
+    }
+    return object;
+  }
+}

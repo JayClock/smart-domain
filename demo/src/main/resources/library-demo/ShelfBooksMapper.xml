@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="reengineering.ddd.demo.library.mybatis.mappers.ShelfBooksMapper">
+  <resultMap id="book" type="reengineering.ddd.demo.library.model.Book">
+    <id property="identity" column="id" jdbcType="BIGINT" javaType="String"/>
+    <association property="description"
+                 javaType="reengineering.ddd.demo.library.description.BookDescription">
+      <constructor>
+        <arg column="title" jdbcType="VARCHAR" javaType="String"/>
+      </constructor>
+    </association>
+  </resultMap>
+</mapper>

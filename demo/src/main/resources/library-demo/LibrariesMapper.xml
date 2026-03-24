@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="reengineering.ddd.demo.library.mybatis.mappers.LibrariesMapper">
+  <resultMap id="library" type="reengineering.ddd.demo.library.model.Library">
+    <id property="identity" column="id" jdbcType="BIGINT" javaType="String"/>
+    <association property="description"
+                 javaType="reengineering.ddd.demo.library.description.LibraryDescription">
+      <constructor>
+        <arg column="name" jdbcType="VARCHAR" javaType="String"/>
+      </constructor>
+    </association>
+    <association property="shelves"
+                 javaType="reengineering.ddd.demo.library.mybatis.LibraryShelves">
+      <result column="id" property="libraryId" javaType="int"/>
+    </association>
+  </resultMap>
+</mapper>

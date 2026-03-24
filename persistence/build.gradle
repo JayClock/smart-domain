@@ -1,0 +1,15 @@
+group = 'io.github.jayclock.smartdomain'
+
+base {
+    archivesName = 'smart-domain-persistence'
+}
+
+dependencies {
+    api project(':backend:core')
+    implementation 'org.springframework:spring-context'
+    implementation 'org.springframework:spring-context-support'
+    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
+
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
