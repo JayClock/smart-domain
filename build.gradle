@@ -83,6 +83,7 @@ if (project == rootProject) {
         apply plugin: 'io.spring.dependency-management'
         apply plugin: 'maven-publish'
         apply plugin: 'com.diffplug.spotless'
+        apply plugin: 'signing'
 
         spotless {
             java {
@@ -133,15 +134,49 @@ if (project == rootProject) {
         }
     }
 
+    def configureCentralPublishingRepository = { publishing ->
+        def centralUsername = findProperty('centralUsername') ?: System.getenv('CENTRAL_TOKEN_USERNAME')
+        def centralPassword = findProperty('centralPassword') ?: System.getenv('CENTRAL_TOKEN_PASSWORD')
+
+        publishing.repositories {
+            maven {
+                name = 'central'
+                url = uri(
+                    'https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/')
+                credentials {
+                    username = centralUsername
+                    password = centralPassword
+                }
+            }
+        }
+    }
+
+    def configureSigning = { target ->
+        def signingKey = target.findProperty('signingInMemoryKey') ?: System.getenv('GPG_PRIVATE_KEY')
+        def signingPassword =
+            target.findProperty('signingInMemoryKeyPassword') ?: System.getenv('GPG_PASSPHRASE')
+
+        target.signing {
+            required {
+                def releaseVersion = !(target.version?.toString()?.endsWith('-SNAPSHOT') ?: false)
+                releaseVersion && signingKey && signingPassword
+            }
+            if (signingKey && signingPassword) {
+                useInMemoryPgpKeys(signingKey, signingPassword)
+            }
+        }
+    }
+
     def configureSmartDomainPom = { MavenPublication publication, Map<String, String> metadata ->
         def smartDomainProjectUrl =
-            findProperty('smartDomainProjectUrl') ?: 'https://github.com/JayClock/team-ai/tree/main/smart-domain'
+            findProperty('smartDomainProjectUrl') ?: 'https://github.com/JayClock/smart-domain'
         def smartDomainScmConnection =
-            findProperty('smartDomainScmConnection') ?: 'scm:git:https://github.com/JayClock/team-ai.git'
+            findProperty('smartDomainScmConnection') ?: 'scm:git:https://github.com/JayClock/smart-domain.git'
         def smartDomainScmDeveloperConnection =
-            findProperty('smartDomainScmDeveloperConnection') ?: 'scm:git:ssh://git@github.com/JayClock/team-ai.git'
+            findProperty('smartDomainScmDeveloperConnection') ?:
+                'scm:git:ssh://git@github.com/JayClock/smart-domain.git'
         def smartDomainScmUrl =
-            findProperty('smartDomainScmUrl') ?: 'https://github.com/JayClock/team-ai/tree/main/smart-domain'
+            findProperty('smartDomainScmUrl') ?: 'https://github.com/JayClock/smart-domain'
 
         publication.pom {
             name = metadata.name
@@ -162,6 +197,7 @@ if (project == rootProject) {
                 developer {
                     id = 'jayclock'
                     name = 'JayClock'
+                    url = 'https://github.com/JayClock'
                 }
             }
         }
@@ -199,11 +235,21 @@ if (project == rootProject) {
                 }
             }
         }
+
+        configureCentralPublishingRepository(publishing)
+        configureSigning(project)
+
+        afterEvaluate {
+            signing {
+                sign publishing.publications.named('mavenJava').get()
+            }
+        }
     }
 
     project(smartDomainBomPath) {
         apply plugin: 'java-platform'
         apply plugin: 'maven-publish'
+        apply plugin: 'signing'
 
         dependencies {
             constraints {
@@ -226,6 +272,29 @@ if (project == rootProject) {
                 }
             }
         }
+
+        configureCentralPublishingRepository(publishing)
+        configureSigning(project)
+
+        afterEvaluate {
+            signing {
+                sign publishing.publications.named('mavenBom').get()
+            }
+        }
+    }
+
+    tasks.register('publishReleaseToCentral') {
+        group = 'publishing'
+        description = 'Publish all Smart Domain modules to the Central staging compatibility API.'
+        dependsOn(
+            ':core:publishMavenJavaPublicationToCentralRepository',
+            ':api-hateoas:publishMavenJavaPublicationToCentralRepository',
+            ':api-jersey:publishMavenJavaPublicationToCentralRepository',
+            ':api-spring-boot-starter:publishMavenJavaPublicationToCentralRepository',
+            ':persistence:publishMavenJavaPublicationToCentralRepository',
+            ':mybatis:publishMavenJavaPublicationToCentralRepository',
+            ':mybatis-spring-boot-starter:publishMavenJavaPublicationToCentralRepository',
+            ':bom:publishMavenBomPublicationToCentralRepository')
     }
 } else {
     description = 'Smart Domain product root'

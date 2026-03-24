@@ -121,6 +121,7 @@ Advanced module API:
 ## Docs
 
 - [Release Readiness](./docs/release-readiness.md)
+- [Releasing](./RELEASING.md)
 - [Repository Split Readiness](./docs/repository-split-readiness.md)
 - [Migration Guide](./docs/migration-from-team-ai.md)
 - [Naming Conventions](./docs/naming-conventions.md)
