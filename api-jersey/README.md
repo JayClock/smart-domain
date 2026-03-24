@@ -2,6 +2,8 @@
 
 Jersey-specific support for Smart Domain APIs.
 
+Status: advanced low-level module, not the primary public entrypoint.
+
 This module currently provides:
 
 - `VendorMediaTypeInterceptor`

@@ -2,6 +2,8 @@
 
 Reusable HATEOAS and HAL-FORMS support for Smart Domain based APIs.
 
+Status: advanced low-level module, not the primary public entrypoint.
+
 This module is intentionally framework-support oriented. It does not ship Team AI resource models or
 business endpoints. Instead it provides:
 
@@ -20,4 +22,4 @@ Choose this module when you need:
 - `@WithJsonSchema` and JSON Schema-backed HAL-FORMS fields
 
 If you are on Spring Boot with Jersey, prefer `smart-domain-api-spring-boot-starter` and let it
-pull this module in transitively.
+pull this module in transitively. Most external users should not depend on this module first.

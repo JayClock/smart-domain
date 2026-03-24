@@ -2,7 +2,18 @@
 
 Use the BOM to keep every Smart Domain artifact on the same version.
 
-## Gradle
+## Recommended Public Usage
+
+Most users should start with the public entrypoints:
+
+```groovy
+implementation platform('io.github.jayclock.smartdomain:smart-domain-bom:0.1.0-SNAPSHOT')
+implementation 'io.github.jayclock.smartdomain:smart-domain-core'
+implementation 'io.github.jayclock.smartdomain:smart-domain-api-spring-boot-starter'
+implementation 'io.github.jayclock.smartdomain:smart-domain-mybatis-spring-boot-starter'
+```
+
+## Gradle Advanced Composition
 
 ```groovy
 implementation platform('io.github.jayclock.smartdomain:smart-domain-bom:0.1.0-SNAPSHOT')

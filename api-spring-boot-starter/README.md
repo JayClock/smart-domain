@@ -7,6 +7,8 @@
 - JSON Schema-backed HAL-FORMS options when `smart-domain.api.schema-scan-packages` is set
 - Smart Domain API Jersey integration through `smart-domain-api-jersey`
 
+This is one of the primary public entrypoints for Smart Domain API adoption.
+
 Typical usage:
 
 ```yaml

@@ -34,11 +34,25 @@ This guide maps existing Team AI internal modules to the publishable Smart Domai
 ## Suggested Order
 
 1. Import the BOM.
-2. Replace package imports in your domain and MyBatis adapters.
-3. Replace Spring config imports with `io.github.jayclock.smartdomain.boot.EnableSmartDomainMybatis`.
-4. Replace API support imports with `smart-domain-api-hateoas`, `smart-domain-api-jersey`, and
-   `smart-domain-api-spring-boot-starter` where appropriate.
-5. Run your context bootstrap and mapper tests against `mavenLocal` or a snapshot repository.
+2. Replace package imports in your domain code with `smart-domain-core`.
+3. Prefer `smart-domain-mybatis-spring-boot-starter` over low-level MyBatis modules unless you are
+   composing the integration manually.
+4. Prefer `smart-domain-api-spring-boot-starter` over low-level API modules unless you are
+   composing the API stack manually.
+5. Replace Spring config imports with `io.github.jayclock.smartdomain.boot.EnableSmartDomainMybatis`.
+6. Run your context bootstrap and mapper tests against `mavenLocal` or a snapshot repository.
+
+## Public Entry Points First
+
+For most migrations, start from:
+
+- `smart-domain-bom`
+- `smart-domain-core`
+- `smart-domain-api-spring-boot-starter`
+- `smart-domain-mybatis-spring-boot-starter`
+
+Only move down to `smart-domain-api-hateoas`, `smart-domain-api-jersey`, `smart-domain-persistence`
+or `smart-domain-mybatis` when you intentionally need low-level composition.
 
 ## What Does Not Move
 

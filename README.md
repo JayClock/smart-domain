@@ -54,29 +54,42 @@ The core pattern is:
 
 | Artifact | Purpose |
 | --- | --- |
-| `smart-domain-core` | Base entity, association, and context-role switching abstractions |
-| `smart-domain-api-hateoas` | Reusable vendor media type, pagination, HAL-FORMS and JSON Schema support |
-| `smart-domain-api-jersey` | Jersey-specific interceptor and integration support |
-| `smart-domain-api-spring-boot-starter` | Spring Boot auto-configuration for Smart Domain API support |
-| `smart-domain-persistence` | Cache hydration SPI and reflective base hydrator |
-| `smart-domain-mybatis` | MyBatis-specific association adapters and hydrator |
-| `smart-domain-mybatis-spring-boot-starter` | Spring Boot entry point |
-| `smart-domain-bom` | Version alignment |
+| `smart-domain-bom` | Public version-alignment entrypoint |
+| `smart-domain-core` | Public core entrypoint for entity, association, and context-role abstractions |
+| `smart-domain-api-spring-boot-starter` | Public API entrypoint for Spring Boot applications |
+| `smart-domain-mybatis-spring-boot-starter` | Public persistence entrypoint for Spring Boot applications |
+| `smart-domain-api-hateoas` | Advanced low-level API support module |
+| `smart-domain-api-jersey` | Advanced low-level Jersey integration module |
+| `smart-domain-persistence` | Advanced low-level hydration SPI |
+| `smart-domain-mybatis` | Advanced low-level MyBatis integration module |
 
-## Recommended Entry
+## Public Entry Points
 
-For Spring Boot applications, start with:
+Most users should start with only these artifacts:
 
 1. `smart-domain-bom`
 2. `smart-domain-core`
-3. `smart-domain-api-hateoas` if you are exposing Smart Domain resources over REST or HAL
-4. `smart-domain-api-jersey` if you are building on Jersey directly
-5. `smart-domain-api-spring-boot-starter` if you want Spring Boot to auto-configure HAL and Jersey support
-6. `smart-domain-mybatis`
-7. `smart-domain-mybatis-spring-boot-starter`
+3. `smart-domain-api-spring-boot-starter` when you expose Smart Domain resources over REST
+4. `smart-domain-mybatis-spring-boot-starter` when you integrate Smart Domain with MyBatis
 
-If you are integrating without Spring Boot, start from `smart-domain-core` and add the persistence
-module you actually need.
+This is the supported product surface we intend external users to adopt first.
+
+## Advanced Modules
+
+The remaining artifacts are still published, but they are low-level composition modules rather than
+the primary product entrypoints:
+
+- `smart-domain-api-hateoas`
+- `smart-domain-api-jersey`
+- `smart-domain-persistence`
+- `smart-domain-mybatis`
+
+Use them only when you are intentionally composing Smart Domain without the starters, such as:
+
+- building without Spring Boot
+- integrating only the HATEOAS layer
+- integrating only the MyBatis layer
+- extending Smart Domain internals in framework-specific ways
 
 ## Stable vs Internal API
 
@@ -84,23 +97,26 @@ Stable API:
 
 - `io.github.jayclock.smartdomain.core.*`
 - `io.github.jayclock.smartdomain.core.context.*`
-- `io.github.jayclock.smartdomain.api.hateoas.*`
 - `io.github.jayclock.smartdomain.api.jersey.VendorMediaTypeInterceptor`
 - `io.github.jayclock.smartdomain.boot.SmartDomainApiAutoConfiguration`
 - `io.github.jayclock.smartdomain.boot.SmartDomainApiJerseyAutoConfiguration`
 - `io.github.jayclock.smartdomain.boot.SmartDomainApiProperties`
-- `io.github.jayclock.smartdomain.persistence.EntityHydrator`
-- `io.github.jayclock.smartdomain.persistence.AbstractReflectiveEntityHydrator`
-- `io.github.jayclock.smartdomain.persistence.HydratingCacheManager`
-- `io.github.jayclock.smartdomain.mybatis.AssociationMapping`
-- `io.github.jayclock.smartdomain.mybatis.GenericEntityHydrator`
-- `io.github.jayclock.smartdomain.mybatis.database.EntityList`
 - `io.github.jayclock.smartdomain.boot.EnableSmartDomainMybatis`
 
 Internal API:
 
 - Types annotated with `io.github.jayclock.smartdomain.core.InternalApi`
 - Bootstrapping helpers and cache serialization types
+
+Advanced module API:
+
+- `io.github.jayclock.smartdomain.api.hateoas.*`
+- `io.github.jayclock.smartdomain.persistence.EntityHydrator`
+- `io.github.jayclock.smartdomain.persistence.AbstractReflectiveEntityHydrator`
+- `io.github.jayclock.smartdomain.persistence.HydratingCacheManager`
+- `io.github.jayclock.smartdomain.mybatis.AssociationMapping`
+- `io.github.jayclock.smartdomain.mybatis.GenericEntityHydrator`
+- `io.github.jayclock.smartdomain.mybatis.database.EntityList`
 
 ## Docs
 

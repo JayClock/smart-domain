@@ -3,6 +3,8 @@
 `smart-domain-mybatis-spring-boot-starter` is the recommended entry point for Spring Boot
 applications.
 
+This is one of the primary public entrypoints for Smart Domain persistence adoption.
+
 ## Coordinates
 
 ```groovy

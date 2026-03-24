@@ -13,6 +13,23 @@ As of 2026-03-24, the repository has produced and validated a local snapshot rel
 - `io.github.jayclock.smartdomain:smart-domain-mybatis-spring-boot-starter:0.1.0-SNAPSHOT`
 - `io.github.jayclock.smartdomain:smart-domain-bom:0.1.0-SNAPSHOT`
 
+## Public Product Surface
+
+The recommended public entrypoints for `0.1.x` are:
+
+- `io.github.jayclock.smartdomain:smart-domain-bom`
+- `io.github.jayclock.smartdomain:smart-domain-core`
+- `io.github.jayclock.smartdomain:smart-domain-api-spring-boot-starter`
+- `io.github.jayclock.smartdomain:smart-domain-mybatis-spring-boot-starter`
+
+The following modules remain published for advanced composition, but are not the primary adoption
+path:
+
+- `smart-domain-api-hateoas`
+- `smart-domain-api-jersey`
+- `smart-domain-persistence`
+- `smart-domain-mybatis`
+
 ## Validated Commands
 
 Snapshot publication from the product root:
