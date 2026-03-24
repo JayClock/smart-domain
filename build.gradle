@@ -5,6 +5,11 @@ plugins {
 
 if (project == rootProject) {
     ext.smartDomainCoordinates = [
+        (project.path == ':' ? ':api-hateoas' : "${project.path}:api-hateoas"): [
+            artifactId : 'smart-domain-api-hateoas',
+            name       : 'Smart Domain API HATEOAS',
+            description: 'HATEOAS and HAL-FORMS support utilities for Smart Domain APIs.'
+        ],
         (project.path == ':' ? ':core' : "${project.path}:core"): [
             artifactId : 'smart-domain-core',
             name       : 'Smart Domain Core',
@@ -184,6 +189,7 @@ if (project == rootProject) {
         dependencies {
             constraints {
                 api "${group}:smart-domain-core:${version}"
+                api "${group}:smart-domain-api-hateoas:${version}"
                 api "${group}:smart-domain-persistence:${version}"
                 api "${group}:smart-domain-mybatis:${version}"
                 api "${group}:smart-domain-mybatis-spring-boot-starter:${version}"

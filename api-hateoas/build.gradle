@@ -1,0 +1,18 @@
+group = 'io.github.jayclock.smartdomain'
+
+base {
+    archivesName = 'smart-domain-api-hateoas'
+}
+
+dependencies {
+    api project(rootProject.ext.smartDomainProjectPath('core'))
+    api 'jakarta.ws.rs:jakarta.ws.rs-api'
+    api 'org.springframework.hateoas:spring-hateoas'
+    implementation 'org.springframework:spring-context'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    implementation 'com.github.victools:jsonschema-generator:4.31.0'
+    implementation 'com.github.victools:jsonschema-module-jackson:4.31.0'
+
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}

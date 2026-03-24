@@ -9,6 +9,7 @@ a small publishable product line.
 smart-domain/
 ├── bom/
 ├── core/
+├── api-hateoas/
 ├── persistence/
 ├── mybatis/
 ├── mybatis-spring-boot-starter/
@@ -47,6 +48,7 @@ The core pattern is:
 | Artifact | Purpose |
 | --- | --- |
 | `smart-domain-core` | Base entity and association abstractions |
+| `smart-domain-api-hateoas` | Reusable vendor media type, pagination, HAL-FORMS and JSON Schema support |
 | `smart-domain-persistence` | Cache hydration SPI and reflective base hydrator |
 | `smart-domain-mybatis` | MyBatis-specific association adapters and hydrator |
 | `smart-domain-mybatis-spring-boot-starter` | Spring Boot entry point |
@@ -58,8 +60,9 @@ For Spring Boot applications, start with:
 
 1. `smart-domain-bom`
 2. `smart-domain-core`
-3. `smart-domain-mybatis`
-4. `smart-domain-mybatis-spring-boot-starter`
+3. `smart-domain-api-hateoas` if you are exposing Smart Domain resources over REST or HAL
+4. `smart-domain-mybatis`
+5. `smart-domain-mybatis-spring-boot-starter`
 
 If you are integrating without Spring Boot, start from `smart-domain-core` and add the persistence
 module you actually need.
@@ -69,6 +72,7 @@ module you actually need.
 Stable API:
 
 - `io.github.jayclock.smartdomain.core.*`
+- `io.github.jayclock.smartdomain.api.hateoas.*`
 - `io.github.jayclock.smartdomain.persistence.EntityHydrator`
 - `io.github.jayclock.smartdomain.persistence.AbstractReflectiveEntityHydrator`
 - `io.github.jayclock.smartdomain.persistence.HydratingCacheManager`
