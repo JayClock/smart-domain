@@ -1,4 +1,4 @@
-group = 'io.github.jayclock.smartdomain'
+group = 'io.github.jayclock'
 
 base {
     archivesName = 'smart-domain-persistence'

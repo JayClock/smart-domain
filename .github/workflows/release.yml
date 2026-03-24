@@ -76,12 +76,7 @@ jobs:
 
           find "${BUNDLE_ROOT}" -type f \( \
             -name 'maven-metadata.xml*' -o \
-            -name '*.module' -o \
-            -name '*.module.asc' -o \
-            -name '*.module.md5' -o \
-            -name '*.module.sha1' -o \
-            -name '*.module.sha256' -o \
-            -name '*.module.sha512' \
+            -name '*.module*' \
           \) -delete
 
           while IFS= read -r -d '' file; do
