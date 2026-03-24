@@ -62,18 +62,7 @@ jobs:
             echo "No failed or open Central repositories to drop."
             exit 0
           fi
-          REPOSITORIES=$(RESPONSE="${RESPONSE}" python3 -c '
-import json
-import os
-
-data = json.loads(os.environ["RESPONSE"])
-repos = data.get("repositories", data if isinstance(data, list) else [])
-for repo in repos:
-    key = repo.get("key")
-    state = str(repo.get("state", "")).lower()
-    if key and state != "released":
-        print(key)
-')
+          REPOSITORIES=$(RESPONSE="${RESPONSE}" python3 -c 'import json, os; data = json.loads(os.environ["RESPONSE"]); repos = data.get("repositories", data if isinstance(data, list) else []); [print(repo.get("key")) for repo in repos if repo.get("key") and str(repo.get("state", "")).lower() != "released"]')
 
           if [ -z "${REPOSITORIES}" ]; then
             echo "No failed or open Central repositories to drop."
