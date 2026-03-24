@@ -100,11 +100,14 @@ jobs:
 
           echo "Deployment ID: ${DEPLOYMENT_ID}"
 
-          for attempt in $(seq 1 40); do
+          LAST_STATUS_JSON=''
+
+          for attempt in $(seq 1 120); do
             STATUS_JSON=$(curl --fail --silent --show-error \
               --request POST \
               --header "Authorization: Bearer ${AUTH}" \
               "https://central.sonatype.com/api/v1/publisher/status?id=${DEPLOYMENT_ID}")
+            LAST_STATUS_JSON="${STATUS_JSON}"
             STATE=$(printf '%s' "${STATUS_JSON}" | python3 -c 'import json, sys; print(json.load(sys.stdin)["deploymentState"])')
             echo "Attempt ${attempt}: deployment state is ${STATE}"
 
@@ -121,4 +124,7 @@ jobs:
           done
 
           echo "Timed out waiting for Central deployment to publish."
+          if [ -n "${LAST_STATUS_JSON}" ]; then
+            echo "${LAST_STATUS_JSON}"
+          fi
           exit 1
