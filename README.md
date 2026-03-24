@@ -10,6 +10,7 @@ smart-domain/
 ├── bom/
 ├── core/
 ├── api-hateoas/
+├── api-spring-boot-starter/
 ├── persistence/
 ├── mybatis/
 ├── mybatis-spring-boot-starter/
@@ -49,6 +50,7 @@ The core pattern is:
 | --- | --- |
 | `smart-domain-core` | Base entity and association abstractions |
 | `smart-domain-api-hateoas` | Reusable vendor media type, pagination, HAL-FORMS and JSON Schema support |
+| `smart-domain-api-spring-boot-starter` | Spring Boot auto-configuration for Smart Domain API support |
 | `smart-domain-persistence` | Cache hydration SPI and reflective base hydrator |
 | `smart-domain-mybatis` | MyBatis-specific association adapters and hydrator |
 | `smart-domain-mybatis-spring-boot-starter` | Spring Boot entry point |
@@ -61,8 +63,9 @@ For Spring Boot applications, start with:
 1. `smart-domain-bom`
 2. `smart-domain-core`
 3. `smart-domain-api-hateoas` if you are exposing Smart Domain resources over REST or HAL
-4. `smart-domain-mybatis`
-5. `smart-domain-mybatis-spring-boot-starter`
+4. `smart-domain-api-spring-boot-starter` if you want Spring Boot to auto-configure HAL and Jersey support
+5. `smart-domain-mybatis`
+6. `smart-domain-mybatis-spring-boot-starter`
 
 If you are integrating without Spring Boot, start from `smart-domain-core` and add the persistence
 module you actually need.
@@ -73,6 +76,8 @@ Stable API:
 
 - `io.github.jayclock.smartdomain.core.*`
 - `io.github.jayclock.smartdomain.api.hateoas.*`
+- `io.github.jayclock.smartdomain.boot.SmartDomainApiAutoConfiguration`
+- `io.github.jayclock.smartdomain.boot.SmartDomainApiProperties`
 - `io.github.jayclock.smartdomain.persistence.EntityHydrator`
 - `io.github.jayclock.smartdomain.persistence.AbstractReflectiveEntityHydrator`
 - `io.github.jayclock.smartdomain.persistence.HydratingCacheManager`
@@ -89,6 +94,7 @@ Internal API:
 ## Next Reads
 
 - [Starter README](./mybatis-spring-boot-starter/README.md)
+- [API Starter README](./api-spring-boot-starter/README.md)
 - [BOM README](./bom/README.md)
 - [Migration Guide](../docs/smart-domain/migration-from-team-ai.md)
 - [Naming Conventions](../docs/smart-domain/naming-conventions.md)

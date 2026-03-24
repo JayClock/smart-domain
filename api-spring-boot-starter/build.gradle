@@ -1,0 +1,15 @@
+group = 'io.github.jayclock.smartdomain'
+
+base {
+    archivesName = 'smart-domain-api-spring-boot-starter'
+}
+
+dependencies {
+    api project(rootProject.ext.smartDomainProjectPath('api-hateoas'))
+    api 'org.springframework.boot:spring-boot-autoconfigure'
+    api 'org.springframework.boot:spring-boot-starter-hateoas'
+    api 'org.springframework.boot:spring-boot-starter-jersey'
+
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
