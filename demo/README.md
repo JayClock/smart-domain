@@ -85,6 +85,28 @@ The same rule applies to `Shelf.books -> ShelfBooks`.
 
 This is intentionally parallel to the Team AI production pattern, but with a much smaller model.
 
+## Ecommerce context demo
+
+This module now also includes an `ecommerce` demo that shows context roles and mixed persistence:
+
+| Context | Actor Role | Domain Entry | Association Adapter | Persistence Style |
+| --- | --- | --- | --- | --- |
+| Purchasing | `Buyer` | `BuyerAccount.purchases` | `memory.BuyerPurchases` | In-memory |
+| Sales | `Seller` | `SellerStore.listings` | `mybatis.SellerListings` | MyBatis |
+
+The ecommerce demo adds:
+
+- `PurchasingContext` and `SalesContext` built on `ContextSwitcher`
+- `Buyer` and `Seller` role objects bound to `User + BuyerAccount/SellerStore`
+- a REST API sample under `ecommerce/api`
+- a starter descriptor under `ecommerce/mybatis/config`
+
+That makes the demo cover three Smart Domain ideas in one place:
+
+1. association objects
+2. context-specific role switching
+3. HATEOAS-first API exposure
+
 ## Starter correspondence example
 
 The starter demo adds the runtime layer without introducing Team AI business packages:

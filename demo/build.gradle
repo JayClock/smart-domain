@@ -1,4 +1,5 @@
 dependencies {
+    implementation project(rootProject.ext.smartDomainProjectPath('api-spring-boot-starter'))
     implementation project(rootProject.ext.smartDomainProjectPath('core'))
     implementation project(rootProject.ext.smartDomainProjectPath('mybatis'))
     implementation project(rootProject.ext.smartDomainProjectPath('mybatis-spring-boot-starter'))

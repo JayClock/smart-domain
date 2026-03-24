@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="reengineering.ddd.demo.ecommerce.mybatis.mappers.SellerListingsMapper">
+  <resultMap id="listing" type="reengineering.ddd.demo.ecommerce.model.Listing">
+    <id property="identity" column="id" jdbcType="BIGINT" javaType="String"/>
+    <association property="description"
+                 javaType="reengineering.ddd.demo.ecommerce.description.ListingDescription">
+      <constructor>
+        <arg column="product_name" jdbcType="VARCHAR" javaType="String"/>
+        <arg column="inventory" jdbcType="INTEGER" javaType="int"/>
+        <arg column="unit_price" jdbcType="INTEGER" javaType="int"/>
+      </constructor>
+    </association>
+  </resultMap>
+</mapper>

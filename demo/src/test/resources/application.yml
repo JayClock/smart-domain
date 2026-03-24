@@ -1,0 +1,9 @@
+spring:
+  jersey:
+    application-path: /api
+    type: filter
+
+smart-domain:
+  api:
+    schema-scan-packages:
+      - reengineering.ddd.demo.ecommerce.api
