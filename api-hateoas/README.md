@@ -9,3 +9,5 @@ business endpoints. Instead it provides:
 - pagination for Smart Domain collections
 - HAL-FORMS option abstractions
 - JSON Schema integration for HAL-FORMS inputs
+
+Jersey-specific response interception lives in `smart-domain-api-jersey`.

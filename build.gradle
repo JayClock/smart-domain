@@ -10,6 +10,11 @@ if (project == rootProject) {
             name       : 'Smart Domain API HATEOAS',
             description: 'HATEOAS and HAL-FORMS support utilities for Smart Domain APIs.'
         ],
+        (project.path == ':' ? ':api-jersey' : "${project.path}:api-jersey"): [
+            artifactId : 'smart-domain-api-jersey',
+            name       : 'Smart Domain API Jersey',
+            description: 'Jersey integration for Smart Domain API support.'
+        ],
         (project.path == ':' ? ':api-spring-boot-starter' : "${project.path}:api-spring-boot-starter"): [
             artifactId : 'smart-domain-api-spring-boot-starter',
             name       : 'Smart Domain API Spring Boot Starter',
@@ -195,6 +200,7 @@ if (project == rootProject) {
             constraints {
                 api "${group}:smart-domain-core:${version}"
                 api "${group}:smart-domain-api-hateoas:${version}"
+                api "${group}:smart-domain-api-jersey:${version}"
                 api "${group}:smart-domain-api-spring-boot-starter:${version}"
                 api "${group}:smart-domain-persistence:${version}"
                 api "${group}:smart-domain-mybatis:${version}"

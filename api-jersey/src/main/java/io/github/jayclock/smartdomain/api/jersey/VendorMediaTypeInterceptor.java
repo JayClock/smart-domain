@@ -1,4 +1,4 @@
-package io.github.jayclock.smartdomain.api.hateoas.provider;
+package io.github.jayclock.smartdomain.api.jersey;
 
 import io.github.jayclock.smartdomain.api.hateoas.media.VendorMediaType;
 import jakarta.ws.rs.container.ContainerRequestContext;

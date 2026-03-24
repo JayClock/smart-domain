@@ -1,14 +1,15 @@
 group = 'io.github.jayclock.smartdomain'
 
 base {
-    archivesName = 'smart-domain-api-spring-boot-starter'
+    archivesName = 'smart-domain-api-jersey'
 }
 
 dependencies {
     api project(rootProject.ext.smartDomainProjectPath('api-hateoas'))
-    api project(rootProject.ext.smartDomainProjectPath('api-jersey'))
-    api 'org.springframework.boot:spring-boot-autoconfigure'
-    api 'org.springframework.boot:spring-boot-starter-hateoas'
+    api 'org.glassfish.jersey.core:jersey-server'
+
+    implementation 'org.springframework.boot:spring-boot-autoconfigure'
+    implementation 'org.springframework.boot:spring-boot-starter-jersey'
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

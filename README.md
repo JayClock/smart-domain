@@ -10,12 +10,14 @@ smart-domain/
 ├── bom/
 ├── core/
 ├── api-hateoas/
+├── api-jersey/
 ├── api-spring-boot-starter/
 ├── persistence/
 ├── mybatis/
 ├── mybatis-spring-boot-starter/
 ├── demo/
-└── samples/consumer/
+├── samples/consumer/
+└── samples/api-consumer/
 ```
 
 The Gradle project paths now live under `:smart-domain:*`, so the product boundary is visible in
@@ -50,6 +52,7 @@ The core pattern is:
 | --- | --- |
 | `smart-domain-core` | Base entity and association abstractions |
 | `smart-domain-api-hateoas` | Reusable vendor media type, pagination, HAL-FORMS and JSON Schema support |
+| `smart-domain-api-jersey` | Jersey-specific interceptor and integration support |
 | `smart-domain-api-spring-boot-starter` | Spring Boot auto-configuration for Smart Domain API support |
 | `smart-domain-persistence` | Cache hydration SPI and reflective base hydrator |
 | `smart-domain-mybatis` | MyBatis-specific association adapters and hydrator |
@@ -63,9 +66,10 @@ For Spring Boot applications, start with:
 1. `smart-domain-bom`
 2. `smart-domain-core`
 3. `smart-domain-api-hateoas` if you are exposing Smart Domain resources over REST or HAL
-4. `smart-domain-api-spring-boot-starter` if you want Spring Boot to auto-configure HAL and Jersey support
-5. `smart-domain-mybatis`
-6. `smart-domain-mybatis-spring-boot-starter`
+4. `smart-domain-api-jersey` if you are building on Jersey directly
+5. `smart-domain-api-spring-boot-starter` if you want Spring Boot to auto-configure HAL and Jersey support
+6. `smart-domain-mybatis`
+7. `smart-domain-mybatis-spring-boot-starter`
 
 If you are integrating without Spring Boot, start from `smart-domain-core` and add the persistence
 module you actually need.
@@ -76,7 +80,9 @@ Stable API:
 
 - `io.github.jayclock.smartdomain.core.*`
 - `io.github.jayclock.smartdomain.api.hateoas.*`
+- `io.github.jayclock.smartdomain.api.jersey.VendorMediaTypeInterceptor`
 - `io.github.jayclock.smartdomain.boot.SmartDomainApiAutoConfiguration`
+- `io.github.jayclock.smartdomain.boot.SmartDomainApiJerseyAutoConfiguration`
 - `io.github.jayclock.smartdomain.boot.SmartDomainApiProperties`
 - `io.github.jayclock.smartdomain.persistence.EntityHydrator`
 - `io.github.jayclock.smartdomain.persistence.AbstractReflectiveEntityHydrator`
@@ -94,7 +100,10 @@ Internal API:
 ## Next Reads
 
 - [Starter README](./mybatis-spring-boot-starter/README.md)
+- [API Quick Start](./api-quick-start.md)
+- [API Jersey README](./api-jersey/README.md)
 - [API Starter README](./api-spring-boot-starter/README.md)
+- [API Consumer Sample](./samples/api-consumer/README.md)
 - [BOM README](./bom/README.md)
 - [Migration Guide](../docs/smart-domain/migration-from-team-ai.md)
 - [Naming Conventions](../docs/smart-domain/naming-conventions.md)

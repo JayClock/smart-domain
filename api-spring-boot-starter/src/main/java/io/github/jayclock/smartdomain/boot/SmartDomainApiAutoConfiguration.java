@@ -2,19 +2,15 @@ package io.github.jayclock.smartdomain.boot;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.jayclock.smartdomain.api.hateoas.options.HalFormsOptionsCustomizer;
-import io.github.jayclock.smartdomain.api.hateoas.provider.VendorMediaTypeInterceptor;
 import io.github.jayclock.smartdomain.api.hateoas.schema.JsonSchemaHalFormsCustomizer;
 import io.github.jayclock.smartdomain.api.hateoas.schema.JsonSchemaService;
 import jakarta.annotation.PostConstruct;
 import java.util.List;
-import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.server.ServerProperties;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.jersey.ResourceConfigCustomizer;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
@@ -30,7 +26,7 @@ import org.springframework.hateoas.server.LinkRelationProvider;
 @AutoConfiguration
 @EnableConfigurationProperties(SmartDomainApiProperties.class)
 @EnableHypermediaSupport(type = {HypermediaType.HAL, HypermediaType.HAL_FORMS})
-@ConditionalOnClass({ObjectMapper.class, ResourceConfig.class})
+@ConditionalOnClass(ObjectMapper.class)
 public class SmartDomainApiAutoConfiguration {
   private final ObjectMapper objectMapper;
   private final LinkRelationProvider linkRelationProvider;
@@ -95,14 +91,5 @@ public class SmartDomainApiAutoConfiguration {
     }
     return new JsonSchemaHalFormsCustomizer(
         schemaService, mapper, properties.getSchemaScanPackages());
-  }
-
-  @Bean
-  @ConditionalOnMissingBean(name = "smartDomainApiJerseyCustomizer")
-  ResourceConfigCustomizer smartDomainApiJerseyCustomizer() {
-    return resourceConfig -> {
-      resourceConfig.property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, true);
-      resourceConfig.register(VendorMediaTypeInterceptor.class);
-    };
   }
 }

@@ -1,0 +1,11 @@
+spring:
+  main:
+    banner-mode: 'off'
+  jersey:
+    application-path: /api
+    type: filter
+
+smart-domain:
+  api:
+    schema-scan-packages:
+      - sample.smartdomain.api
