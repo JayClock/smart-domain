@@ -1,7 +1,7 @@
 # Smart Domain
 
-Smart Domain extracts the reusable domain-modeling and MyBatis integration pieces from Team AI into
-a small publishable product line.
+Smart Domain is a publishable Java product line for association-object based domain modeling,
+progressive-loading persistence, and HATEOAS-first API exposure.
 
 ## Product Layout
 
@@ -20,8 +20,8 @@ smart-domain/
 └── samples/api-consumer/
 ```
 
-The Gradle project paths now live under `:smart-domain:*`, so the product boundary is visible in
-both directory structure and build coordinates instead of being hidden under `libs/backend/...`.
+The product now builds from `smart-domain/` directly and can be split into its own repository
+without changing artifact coordinates.
 
 ## Build From Product Root
 
@@ -30,10 +30,13 @@ cd smart-domain
 ./gradlew build
 ./gradlew publishToMavenLocal
 ./gradlew -p samples/consumer test
+./gradlew -p samples/api-consumer test
 ```
 
-`smart-domain/` now has its own Gradle root build, so product development and release verification
-no longer need the monorepo root build script as the primary entry point.
+Coordinates:
+
+- Group: `io.github.jayclock.smartdomain`
+- Version: `0.1.0-SNAPSHOT`
 
 ## What Problem It Solves
 
@@ -97,13 +100,15 @@ Internal API:
 - Types annotated with `io.github.jayclock.smartdomain.core.InternalApi`
 - Bootstrapping helpers and cache serialization types
 
-## Next Reads
+## Docs
 
+- [Release Readiness](./docs/release-readiness.md)
+- [Repository Split Readiness](./docs/repository-split-readiness.md)
+- [Migration Guide](./docs/migration-from-team-ai.md)
+- [Naming Conventions](./docs/naming-conventions.md)
 - [Starter README](./mybatis-spring-boot-starter/README.md)
 - [API Quick Start](./api-quick-start.md)
 - [API Jersey README](./api-jersey/README.md)
 - [API Starter README](./api-spring-boot-starter/README.md)
 - [API Consumer Sample](./samples/api-consumer/README.md)
 - [BOM README](./bom/README.md)
-- [Migration Guide](../docs/smart-domain/migration-from-team-ai.md)
-- [Naming Conventions](../docs/smart-domain/naming-conventions.md)

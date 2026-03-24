@@ -1,0 +1,11 @@
+.gradle/
+build/
+out/
+target/
+
+**/.gradle/
+**/build/
+**/out/
+**/target/
+
+.DS_Store

@@ -17,3 +17,9 @@ smart-domain:
 ```
 
 For a complete external consumer example, see [`samples/api-consumer`](../samples/api-consumer/README.md).
+
+Module relationship:
+
+- `smart-domain-api-hateoas` provides the core API annotations and HAL-FORMS helpers
+- `smart-domain-api-jersey` adds Jersey integration
+- `smart-domain-api-spring-boot-starter` auto-configures both for Spring Boot consumers

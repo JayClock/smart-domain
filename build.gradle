@@ -134,10 +134,19 @@ if (project == rootProject) {
     }
 
     def configureSmartDomainPom = { MavenPublication publication, Map<String, String> metadata ->
+        def smartDomainProjectUrl =
+            findProperty('smartDomainProjectUrl') ?: 'https://github.com/JayClock/team-ai/tree/main/smart-domain'
+        def smartDomainScmConnection =
+            findProperty('smartDomainScmConnection') ?: 'scm:git:https://github.com/JayClock/team-ai.git'
+        def smartDomainScmDeveloperConnection =
+            findProperty('smartDomainScmDeveloperConnection') ?: 'scm:git:ssh://git@github.com/JayClock/team-ai.git'
+        def smartDomainScmUrl =
+            findProperty('smartDomainScmUrl') ?: 'https://github.com/JayClock/team-ai/tree/main/smart-domain'
+
         publication.pom {
             name = metadata.name
             description = metadata.description
-            url = 'https://github.com/JayClock/team-ai/tree/main/smart-domain'
+            url = smartDomainProjectUrl
             licenses {
                 license {
                     name = 'MIT License'
@@ -145,9 +154,9 @@ if (project == rootProject) {
                 }
             }
             scm {
-                connection = 'scm:git:https://github.com/JayClock/team-ai.git'
-                developerConnection = 'scm:git:ssh://git@github.com/JayClock/team-ai.git'
-                url = 'https://github.com/JayClock/team-ai/tree/main/smart-domain'
+                connection = smartDomainScmConnection
+                developerConnection = smartDomainScmDeveloperConnection
+                url = smartDomainScmUrl
             }
             developers {
                 developer {
