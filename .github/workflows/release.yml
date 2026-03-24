@@ -58,6 +58,10 @@ jobs:
           RESPONSE=$(curl --fail --silent --show-error \
             --header "Authorization: Bearer ${AUTH}" \
             "https://ossrh-staging-api.central.sonatype.com/manual/search/repositories?ip=any")
+          if [ -z "${RESPONSE}" ]; then
+            echo "No failed or open Central repositories to drop."
+            exit 0
+          fi
           REPOSITORIES=$(printf '%s' "${RESPONSE}" | python3 - <<'PY'
           import json
           import sys
