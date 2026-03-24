@@ -1,0 +1,205 @@
+plugins {
+    id 'io.spring.dependency-management' version '1.1.0' apply false
+    id 'com.diffplug.spotless' version '6.25.0' apply false
+}
+
+if (project == rootProject) {
+    ext.smartDomainCoordinates = [
+        (project.path == ':' ? ':core' : "${project.path}:core"): [
+            artifactId : 'smart-domain-core',
+            name       : 'Smart Domain Core',
+            description: 'Core Smart Domain abstractions for entities and associations.'
+        ],
+        (project.path == ':' ? ':persistence' : "${project.path}:persistence"): [
+            artifactId : 'smart-domain-persistence',
+            name       : 'Smart Domain Persistence',
+            description: 'Persistence SPI and cache hydration support for Smart Domain.'
+        ],
+        (project.path == ':' ? ':mybatis' : "${project.path}:mybatis"): [
+            artifactId : 'smart-domain-mybatis',
+            name       : 'Smart Domain MyBatis',
+            description: 'MyBatis integration for Smart Domain association objects.'
+        ],
+        (project.path == ':' ? ':mybatis-spring-boot-starter' : "${project.path}:mybatis-spring-boot-starter"): [
+            artifactId : 'smart-domain-mybatis-spring-boot-starter',
+            name       : 'Smart Domain MyBatis Spring Boot Starter',
+            description: 'Spring Boot starter for Smart Domain MyBatis integration.'
+        ],
+        (project.path == ':' ? ':bom' : "${project.path}:bom"): [
+            artifactId : 'smart-domain-bom',
+            name       : 'Smart Domain BOM',
+            description: 'Bill of materials for aligning Smart Domain artifact versions.'
+        ]
+    ]
+
+    allprojects {
+        group = findProperty('smartDomainGroup')
+        version = findProperty('smartDomainVersion')
+
+        configurations.all {
+            resolutionStrategy {
+                cacheChangingModulesFor 10, 'minutes'
+                cacheDynamicVersionsFor 10, 'minutes'
+            }
+        }
+
+        repositories {
+            mavenLocal()
+            maven { url 'https://maven.aliyun.com/repository/public/' }
+            mavenCentral()
+            maven { url 'https://repo.spring.io/milestone' }
+            maven { url 'https://repo.spring.io/snapshot' }
+        }
+    }
+
+    rootProject.ext.smartDomainProjectPath = { String moduleName ->
+        def standalonePath = ":${moduleName}"
+        if (findProject(standalonePath) != null) {
+            return standalonePath
+        }
+        return ":smart-domain:${moduleName}"
+    }
+
+    def smartDomainBomPath = project.path == ':' ? ':bom' : "${project.path}:bom"
+    def javaSubprojects = subprojects.findAll { it.path != smartDomainBomPath }
+
+    configure(javaSubprojects) {
+        apply plugin: 'java'
+        apply plugin: 'io.spring.dependency-management'
+        apply plugin: 'maven-publish'
+        apply plugin: 'com.diffplug.spotless'
+
+        spotless {
+            java {
+                target 'src/**/*.java'
+                googleJavaFormat('1.22.0')
+                importOrder()
+                removeUnusedImports()
+            }
+            lineEndings 'UNIX'
+        }
+
+        tasks.named('check').configure {
+            dependsOn tasks.named('spotlessCheck')
+        }
+
+        java {
+            toolchain {
+                languageVersion = JavaLanguageVersion.of(17)
+            }
+        }
+
+        tasks.withType(JavaCompile).configureEach {
+            options.compilerArgs.add('-parameters')
+            options.incremental = true
+            options.encoding = 'UTF-8'
+            options.fork = true
+            options.forkOptions.jvmArgs += ['-Xmx512m']
+        }
+
+        dependencyManagement {
+            imports {
+                mavenBom 'org.springframework.boot:spring-boot-dependencies:3.5.9'
+            }
+        }
+
+        tasks.named('test') {
+            useJUnitPlatform()
+            maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
+
+            if (file("${projectDir}/src/test/resources/logging.properties").exists()) {
+                systemProperty 'java.util.logging.config.file',
+                    "${projectDir}/src/test/resources/logging.properties"
+            }
+        }
+
+        tasks.withType(GenerateModuleMetadata) {
+            suppressedValidationErrors.add('dependencies-without-versions')
+        }
+    }
+
+    def configureSmartDomainPom = { MavenPublication publication, Map<String, String> metadata ->
+        publication.pom {
+            name = metadata.name
+            description = metadata.description
+            url = 'https://github.com/JayClock/team-ai/tree/main/smart-domain'
+            licenses {
+                license {
+                    name = 'MIT License'
+                    url = 'https://opensource.org/licenses/MIT'
+                }
+            }
+            scm {
+                connection = 'scm:git:https://github.com/JayClock/team-ai.git'
+                developerConnection = 'scm:git:ssh://git@github.com/JayClock/team-ai.git'
+                url = 'https://github.com/JayClock/team-ai/tree/main/smart-domain'
+            }
+            developers {
+                developer {
+                    id = 'jayclock'
+                    name = 'JayClock'
+                }
+            }
+        }
+    }
+
+    configure(javaSubprojects.findAll { smartDomainCoordinates.containsKey(it.path) }) {
+        def metadata = smartDomainCoordinates[path]
+
+        apply plugin: 'java-library'
+
+        java {
+            withSourcesJar()
+            withJavadocJar()
+        }
+
+        tasks.withType(Javadoc).configureEach {
+            options.encoding = 'UTF-8'
+            options.addStringOption('Xdoclint:none', '-quiet')
+        }
+
+        publishing {
+            publications {
+                create('mavenJava', MavenPublication) {
+                    artifactId = metadata.artifactId
+                    from components.java
+                    versionMapping {
+                        usage('java-api') {
+                            fromResolutionOf('runtimeClasspath')
+                        }
+                        usage('java-runtime') {
+                            fromResolutionResult()
+                        }
+                    }
+                    configureSmartDomainPom(delegate, metadata)
+                }
+            }
+        }
+    }
+
+    project(smartDomainBomPath) {
+        apply plugin: 'java-platform'
+        apply plugin: 'maven-publish'
+
+        dependencies {
+            constraints {
+                api "${group}:smart-domain-core:${version}"
+                api "${group}:smart-domain-persistence:${version}"
+                api "${group}:smart-domain-mybatis:${version}"
+                api "${group}:smart-domain-mybatis-spring-boot-starter:${version}"
+            }
+        }
+
+        publishing {
+            publications {
+                create('mavenBom', MavenPublication) {
+                    artifactId = smartDomainCoordinates[path].artifactId
+                    from components.javaPlatform
+                    configureSmartDomainPom(delegate, smartDomainCoordinates[path])
+                }
+            }
+        }
+    }
+} else {
+    description = 'Smart Domain product root'
+}

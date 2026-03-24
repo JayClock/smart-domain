@@ -1,0 +1,8 @@
+rootProject.name = 'smart-domain'
+
+include 'bom'
+include 'core'
+include 'demo'
+include 'persistence'
+include 'mybatis'
+include 'mybatis-spring-boot-starter'

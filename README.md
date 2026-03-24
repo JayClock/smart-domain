@@ -19,6 +19,18 @@ smart-domain/
 The Gradle project paths now live under `:smart-domain:*`, so the product boundary is visible in
 both directory structure and build coordinates instead of being hidden under `libs/backend/...`.
 
+## Build From Product Root
+
+```bash
+cd smart-domain
+./gradlew build
+./gradlew publishToMavenLocal
+./gradlew -p samples/consumer test
+```
+
+`smart-domain/` now has its own Gradle root build, so product development and release verification
+no longer need the monorepo root build script as the primary entry point.
+
 ## What Problem It Solves
 
 Smart Domain keeps business entities expressive without forcing eager collection loading or leaking

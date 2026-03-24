@@ -5,8 +5,8 @@ base {
 }
 
 dependencies {
-    api project(':smart-domain:core')
-    api project(':smart-domain:persistence')
+    api project(rootProject.ext.smartDomainProjectPath('core'))
+    api project(rootProject.ext.smartDomainProjectPath('persistence'))
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4'
