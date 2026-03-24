@@ -16,9 +16,8 @@ smart-domain/
 └── samples/consumer/
 ```
 
-The Gradle project paths stay stable as `:backend:*` during this refactor so existing internal
-consumers do not need to change immediately. The product boundary is now expressed by the directory
-layout instead of by `libs/backend/...`.
+The Gradle project paths now live under `:smart-domain:*`, so the product boundary is visible in
+both directory structure and build coordinates instead of being hidden under `libs/backend/...`.
 
 ## What Problem It Solves
 

@@ -5,9 +5,9 @@ base {
 }
 
 dependencies {
-    implementation project(':backend:core')
-    implementation project(':backend:persistent:smart-domain-persistence')
-    implementation project(':backend:persistent:smart-domain-mybatis')
+    implementation project(':smart-domain:core')
+    implementation project(':smart-domain:persistence')
+    implementation project(':smart-domain:mybatis')
     implementation 'org.springframework.boot:spring-boot-autoconfigure'
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4'
     implementation 'jakarta.inject:jakarta.inject-api'

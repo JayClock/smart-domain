@@ -1,7 +1,7 @@
 dependencies {
-    implementation project(':backend:core')
-    implementation project(':backend:persistent:smart-domain-mybatis')
-    implementation project(':backend:persistent:smart-domain-mybatis-spring-boot-starter')
+    implementation project(':smart-domain:core')
+    implementation project(':smart-domain:mybatis')
+    implementation project(':smart-domain:mybatis-spring-boot-starter')
     implementation 'jakarta.inject:jakarta.inject-api'
     implementation 'org.springframework:spring-context'
 
