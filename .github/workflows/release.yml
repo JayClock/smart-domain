@@ -92,14 +92,3 @@ jobs:
             --no-parallel \
             -PsmartDomainVersion=${{ steps.version.outputs.value }} \
             publishReleaseToCentral
-
-      - name: Notify Central Portal
-        env:
-          CENTRAL_TOKEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
-          CENTRAL_TOKEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
-        run: |
-          AUTH=$(printf '%s:%s' "${CENTRAL_TOKEN_USERNAME}" "${CENTRAL_TOKEN_PASSWORD}" | base64 | tr -d '\n')
-          curl --fail \
-            --request POST \
-            --header "Authorization: Bearer ${AUTH}" \
-            "https://ossrh-staging-api.central.sonatype.com/manual/upload/defaultRepository/io.github.jayclock?publishing_type=automatic"

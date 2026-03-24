@@ -39,16 +39,6 @@ cd smart-domain
 ./gradlew --no-parallel -PsmartDomainVersion=0.1.0 publishReleaseToCentral
 ```
 
-After upload, notify the Portal that the repository should be processed:
-
-```bash
-AUTH=$(printf '%s:%s' "${CENTRAL_TOKEN_USERNAME}" "${CENTRAL_TOKEN_PASSWORD}" | base64 | tr -d '\n')
-curl --fail \
-  --request POST \
-  --header "Authorization: Bearer ${AUTH}" \
-  "https://ossrh-staging-api.central.sonatype.com/manual/upload/defaultRepository/io.github.jayclock?publishing_type=automatic"
-```
-
 ## GitHub Release Flow
 
 The standalone repository workflow publishes when a tag like `v0.1.0` is pushed or when the
@@ -58,11 +48,12 @@ It performs:
 
 1. `./gradlew build`
 2. `./gradlew --no-parallel publishReleaseToCentral`
-3. `POST /manual/upload/defaultRepository/io.github.jayclock?publishing_type=automatic`
 
 ## Notes
 
 - Maven Central requires sources jars, javadoc jars, signatures, and complete POM metadata.
 - Maven Central does not accept `-SNAPSHOT` versions as releases.
-- The Central staging compatibility API is sensitive to stale repositories and concurrent uploads.
-  Drop failed repositories before retrying and use `--no-parallel` for release publication.
+- The release build now uses `gradle-nexus/publish-plugin`, which Sonatype lists as compatible
+  with the OSSRH staging compatibility API.
+- `stagingProfileId` is pinned to `io.github.jayclock` so the staging service does not need to
+  infer the namespace from the uploaded `groupId`.
