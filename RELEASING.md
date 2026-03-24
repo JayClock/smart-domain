@@ -36,16 +36,17 @@ export GPG_PRIVATE_KEY="$(cat private.asc)"
 export GPG_PASSPHRASE=...
 
 cd smart-domain
-./gradlew -PsmartDomainVersion=0.1.0 publishReleaseToCentral
+./gradlew --no-parallel -PsmartDomainVersion=0.1.0 publishReleaseToCentral
 ```
 
 After upload, notify the Portal that the repository should be processed:
 
 ```bash
+AUTH=$(printf '%s:%s' "${CENTRAL_TOKEN_USERNAME}" "${CENTRAL_TOKEN_PASSWORD}" | base64 | tr -d '\n')
 curl --fail \
   --request POST \
-  --user "${CENTRAL_TOKEN_USERNAME}:${CENTRAL_TOKEN_PASSWORD}" \
-  "https://ossrh-staging-api.central.sonatype.com/manual/upload/defaultRepository/io.github.jayclock"
+  --header "Authorization: Bearer ${AUTH}" \
+  "https://ossrh-staging-api.central.sonatype.com/manual/upload/defaultRepository/io.github.jayclock?publishing_type=automatic"
 ```
 
 ## GitHub Release Flow
@@ -56,12 +57,12 @@ release workflow is run manually.
 It performs:
 
 1. `./gradlew build`
-2. `./gradlew publishReleaseToCentral`
-3. `POST /manual/upload/defaultRepository/io.github.jayclock`
+2. `./gradlew --no-parallel publishReleaseToCentral`
+3. `POST /manual/upload/defaultRepository/io.github.jayclock?publishing_type=automatic`
 
 ## Notes
 
 - Maven Central requires sources jars, javadoc jars, signatures, and complete POM metadata.
 - Maven Central does not accept `-SNAPSHOT` versions as releases.
-- If the upload fails, inspect the repository in the Central Publisher Portal and drop the failed
-  repository before retrying.
+- The Central staging compatibility API is sensitive to stale repositories and concurrent uploads.
+  Drop failed repositories before retrying and use `--no-parallel` for release publication.

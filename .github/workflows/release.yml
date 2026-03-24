@@ -48,6 +48,44 @@ jobs:
       - name: Make Gradle wrapper executable
         run: chmod +x gradlew
 
+      - name: Drop failed Central staging repositories
+        env:
+          CENTRAL_TOKEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
+          CENTRAL_TOKEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
+        shell: bash
+        run: |
+          AUTH=$(printf '%s:%s' "${CENTRAL_TOKEN_USERNAME}" "${CENTRAL_TOKEN_PASSWORD}" | base64 | tr -d '\n')
+          RESPONSE=$(curl --fail --silent --show-error \
+            --header "Authorization: Bearer ${AUTH}" \
+            "https://ossrh-staging-api.central.sonatype.com/manual/search/repositories?ip=any")
+          REPOSITORIES=$(printf '%s' "${RESPONSE}" | python3 - <<'PY'
+          import json
+          import sys
+
+          data = json.load(sys.stdin)
+          repos = data.get("repositories", data if isinstance(data, list) else [])
+          for repo in repos:
+              key = repo.get("key")
+              state = str(repo.get("state", "")).lower()
+              if key and state != "released":
+                  print(key)
+          PY
+          )
+
+          if [ -z "${REPOSITORIES}" ]; then
+            echo "No failed or open Central repositories to drop."
+            exit 0
+          fi
+
+          while IFS= read -r repository; do
+            [ -z "${repository}" ] && continue
+            echo "Dropping stale Central repository ${repository}"
+            curl --fail --silent --show-error \
+              --request DELETE \
+              --header "Authorization: Bearer ${AUTH}" \
+              "https://ossrh-staging-api.central.sonatype.com/manual/drop/repository/${repository}"
+          done <<< "${REPOSITORIES}"
+
       - name: Build release
         env:
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_PRIVATE_KEY }}
@@ -57,7 +95,10 @@ jobs:
         run: |
           ./gradlew \
             -PsmartDomainVersion=${{ steps.version.outputs.value }} \
-            build \
+            build
+          ./gradlew \
+            --no-parallel \
+            -PsmartDomainVersion=${{ steps.version.outputs.value }} \
             publishReleaseToCentral
 
       - name: Notify Central Portal
@@ -65,7 +106,8 @@ jobs:
           CENTRAL_TOKEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
           CENTRAL_TOKEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
         run: |
+          AUTH=$(printf '%s:%s' "${CENTRAL_TOKEN_USERNAME}" "${CENTRAL_TOKEN_PASSWORD}" | base64 | tr -d '\n')
           curl --fail \
             --request POST \
-            --user "${CENTRAL_TOKEN_USERNAME}:${CENTRAL_TOKEN_PASSWORD}" \
-            "https://ossrh-staging-api.central.sonatype.com/manual/upload/defaultRepository/io.github.jayclock"
+            --header "Authorization: Bearer ${AUTH}" \
+            "https://ossrh-staging-api.central.sonatype.com/manual/upload/defaultRepository/io.github.jayclock?publishing_type=automatic"
