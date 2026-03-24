@@ -127,4 +127,10 @@ jobs:
           if [ -n "${LAST_STATUS_JSON}" ]; then
             echo "${LAST_STATUS_JSON}"
           fi
+
+          if [ "${STATE}" = "PUBLISHING" ]; then
+            echo "Central is still publishing deployment ${DEPLOYMENT_ID}. Treating this workflow as successful and allowing publication to complete asynchronously."
+            exit 0
+          fi
+
           exit 1
