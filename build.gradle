@@ -278,10 +278,26 @@ if (project == rootProject) {
         }
     }
 
+    def sonatypePublishTaskPaths = [
+        ':core:publishToSonatype',
+        ':api-hateoas:publishToSonatype',
+        ':api-jersey:publishToSonatype',
+        ':api-spring-boot-starter:publishToSonatype',
+        ':persistence:publishToSonatype',
+        ':mybatis:publishToSonatype',
+        ':mybatis-spring-boot-starter:publishToSonatype',
+        ':bom:publishToSonatype'
+    ]
+
+    tasks.named('closeAndReleaseSonatypeStagingRepository').configure {
+        mustRunAfter(sonatypePublishTaskPaths)
+    }
+
     tasks.register('publishReleaseToCentral') {
         group = 'publishing'
         description = 'Publish and release all Smart Domain modules to Maven Central via the Sonatype staging compatibility API.'
-        dependsOn('publishToSonatype', 'closeAndReleaseSonatypeStagingRepository')
+        dependsOn(sonatypePublishTaskPaths)
+        dependsOn('closeAndReleaseSonatypeStagingRepository')
     }
 } else {
     description = 'Smart Domain product root'
