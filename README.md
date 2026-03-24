@@ -46,6 +46,7 @@ query logic into services.
 The core pattern is:
 
 - model one-to-many relationships as association objects instead of raw `List`
+- model context-specific behavior as role objects instead of permission checks scattered in services
 - keep entity behavior in domain types
 - let persistence adapters load data lazily and in batches
 
@@ -53,7 +54,7 @@ The core pattern is:
 
 | Artifact | Purpose |
 | --- | --- |
-| `smart-domain-core` | Base entity and association abstractions |
+| `smart-domain-core` | Base entity, association, and context-role switching abstractions |
 | `smart-domain-api-hateoas` | Reusable vendor media type, pagination, HAL-FORMS and JSON Schema support |
 | `smart-domain-api-jersey` | Jersey-specific interceptor and integration support |
 | `smart-domain-api-spring-boot-starter` | Spring Boot auto-configuration for Smart Domain API support |
@@ -82,6 +83,7 @@ module you actually need.
 Stable API:
 
 - `io.github.jayclock.smartdomain.core.*`
+- `io.github.jayclock.smartdomain.core.context.*`
 - `io.github.jayclock.smartdomain.api.hateoas.*`
 - `io.github.jayclock.smartdomain.api.jersey.VendorMediaTypeInterceptor`
 - `io.github.jayclock.smartdomain.boot.SmartDomainApiAutoConfiguration`
@@ -106,6 +108,7 @@ Internal API:
 - [Repository Split Readiness](./docs/repository-split-readiness.md)
 - [Migration Guide](./docs/migration-from-team-ai.md)
 - [Naming Conventions](./docs/naming-conventions.md)
+- [Context Roles](./docs/context-roles.md)
 - [Starter README](./mybatis-spring-boot-starter/README.md)
 - [API Quick Start](./api-quick-start.md)
 - [API Jersey README](./api-jersey/README.md)
