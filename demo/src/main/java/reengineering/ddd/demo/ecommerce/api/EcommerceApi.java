@@ -1,19 +1,21 @@
 package reengineering.ddd.demo.ecommerce.api;
 
+import io.github.jayclock.smartdomain.tool.apimodeltree.ApiModelNode;
+import io.github.jayclock.smartdomain.tool.apimodeltree.ApiModelTreeOptions;
+import io.github.jayclock.smartdomain.tool.apimodeltree.SmartDomainTools;
 import io.github.jayclock.smartdomain.api.hateoas.media.VendorMediaType;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.WebApplicationException;
-import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriInfo;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.mediatype.Affordances;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -26,46 +28,35 @@ public class EcommerceApi {
   }
 
   @GET
+  @Path("agent-tree")
+  @Produces(MediaType.APPLICATION_JSON)
+  public ApiModelNode agentTree(@DefaultValue("false") @QueryParam("includeCycle") boolean includeCycle) {
+    return materialize(
+        SmartDomainTools.apiModelTree(
+            EcommerceRootModel.class, new ApiModelTreeOptions(includeCycle)));
+  }
+
+  @GET
   @VendorMediaType(EcommerceMediaTypes.ROOT)
-  public EcommerceRootModel root(@Context UriInfo uriInfo) {
-    EcommerceRootModel model =
-        EcommerceRootModel.of(
-            facade.user(), facade.buyerAccount().getIdentity(), facade.sellerStore().getIdentity());
-    String baseHref = uriInfo.getAbsolutePath().toString();
-    model.add(Link.of(baseHref).withSelfRel());
-    model.add(Link.of(baseHref + "/users/" + facade.user().getIdentity()).withRel("user"));
-    model.add(
-        Link.of(baseHref + "/buyer-accounts/" + facade.buyerAccount().getIdentity())
-            .withRel("buyer-account"));
-    model.add(
-        Link.of(baseHref + "/seller-stores/" + facade.sellerStore().getIdentity())
-            .withRel("seller-store"));
-    return model;
+  public EcommerceRootModel root() {
+    return EcommerceRootModel.of(
+        facade.user(), facade.buyerAccount().getIdentity(), facade.sellerStore().getIdentity());
   }
 
   @GET
   @Path("users/{userId}")
   @VendorMediaType(EcommerceMediaTypes.USER)
-  public UserModel user(@PathParam("userId") String userId, @Context UriInfo uriInfo) {
+  public UserModel user(@PathParam("userId") String userId) {
     requireSame(userId, facade.user().getIdentity());
-    return UserModel.of(facade.user(), uriInfo.getAbsolutePath().toString());
+    return UserModel.of(facade.user(), EcommerceApiTemplates.user(userId).build().getPath());
   }
 
   @GET
   @Path("buyer-accounts/{accountId}")
   @VendorMediaType(EcommerceMediaTypes.BUYER_ACCOUNT)
-  public BuyerAccountModel buyerAccount(
-      @PathParam("accountId") String accountId, @Context UriInfo uriInfo) {
+  public BuyerAccountModel buyerAccount(@PathParam("accountId") String accountId) {
     requireSame(accountId, facade.buyerAccount().getIdentity());
-    String selfHref = uriInfo.getAbsolutePath().toString();
-    BuyerAccountModel model = BuyerAccountModel.of(facade.buyerAccount(), selfHref, selfHref);
-    model.add(
-        Affordances.of(Link.of(selfHref).withSelfRel())
-            .afford(HttpMethod.POST)
-            .withInput(CreatePurchaseRequest.class)
-            .withName("create-purchase")
-            .toLink());
-    return model;
+    return BuyerAccountModel.of(facade.buyerAccount());
   }
 
   @POST
@@ -74,39 +65,36 @@ public class EcommerceApi {
   @VendorMediaType(EcommerceMediaTypes.PURCHASE)
   public Response createPurchase(
       @PathParam("accountId") String accountId,
-      CreatePurchaseRequest request,
-      @Context UriInfo uriInfo) {
+      CreatePurchaseRequest request) {
     requireSame(accountId, facade.buyerAccount().getIdentity());
     var created = facade.buy(request.productName(), request.quantity());
-    String href =
-        uriInfo.getBaseUriBuilder()
-            .path("ecommerce")
-            .path("buyer-accounts")
-            .path(accountId)
-            .path("purchases")
-            .path(created.getIdentity())
-            .build()
-            .toString();
-    return Response.created(uriInfo.getAbsolutePathBuilder().path(created.getIdentity()).build())
+    String href = EcommerceApiTemplates.purchase(accountId, created.getIdentity()).build().getPath();
+    return Response.created(EcommerceApiTemplates.purchase(accountId, created.getIdentity()).build())
         .entity(PurchaseModel.of(created, href))
         .build();
   }
 
   @GET
+  @Path("buyer-accounts/{accountId}/purchases/{purchaseId}")
+  @VendorMediaType(EcommerceMediaTypes.PURCHASE)
+  public PurchaseModel purchase(
+      @PathParam("accountId") String accountId, @PathParam("purchaseId") String purchaseId) {
+    requireSame(accountId, facade.buyerAccount().getIdentity());
+    var purchase =
+        facade
+            .buyerAccount()
+            .purchases()
+            .findByIdentity(purchaseId)
+            .orElseThrow(() -> new WebApplicationException(Response.Status.NOT_FOUND));
+    return PurchaseModel.of(purchase, EcommerceApiTemplates.purchase(accountId, purchaseId).build().getPath());
+  }
+
+  @GET
   @Path("seller-stores/{storeId}")
   @VendorMediaType(EcommerceMediaTypes.SELLER_STORE)
-  public SellerStoreModel sellerStore(
-      @PathParam("storeId") String storeId, @Context UriInfo uriInfo) {
+  public SellerStoreModel sellerStore(@PathParam("storeId") String storeId) {
     requireSame(storeId, facade.sellerStore().getIdentity());
-    String selfHref = uriInfo.getAbsolutePath().toString();
-    SellerStoreModel model = SellerStoreModel.of(facade.sellerStore(), selfHref, selfHref);
-    model.add(
-        Affordances.of(Link.of(selfHref).withSelfRel())
-            .afford(HttpMethod.POST)
-            .withInput(CreateListingRequest.class)
-            .withName("create-listing")
-            .toLink());
-    return model;
+    return SellerStoreModel.of(facade.sellerStore());
   }
 
   @POST
@@ -115,28 +103,46 @@ public class EcommerceApi {
   @VendorMediaType(EcommerceMediaTypes.LISTING)
   public Response createListing(
       @PathParam("storeId") String storeId,
-      CreateListingRequest request,
-      @Context UriInfo uriInfo) {
+      CreateListingRequest request) {
     requireSame(storeId, facade.sellerStore().getIdentity());
     var created = facade.sell(request.productName(), request.inventory(), request.unitPrice());
-    String href =
-        uriInfo.getBaseUriBuilder()
-            .path("ecommerce")
-            .path("seller-stores")
-            .path(storeId)
-            .path("listings")
-            .path(created.getIdentity())
-            .build()
-            .toString();
-    return Response.created(uriInfo.getAbsolutePathBuilder().path(created.getIdentity()).build())
+    String href = EcommerceApiTemplates.listing(storeId, created.getIdentity()).build().getPath();
+    return Response.created(EcommerceApiTemplates.listing(storeId, created.getIdentity()).build())
         .entity(ListingModel.of(created, href))
         .build();
+  }
+
+  @GET
+  @Path("seller-stores/{storeId}/listings/{listingId}")
+  @VendorMediaType(EcommerceMediaTypes.LISTING)
+  public ListingModel listing(
+      @PathParam("storeId") String storeId, @PathParam("listingId") String listingId) {
+    requireSame(storeId, facade.sellerStore().getIdentity());
+    var listing =
+        facade
+            .sellerStore()
+            .listings()
+            .findByIdentity(listingId)
+            .orElseThrow(() -> new WebApplicationException(Response.Status.NOT_FOUND));
+    return ListingModel.of(listing, EcommerceApiTemplates.listing(storeId, listingId).build().getPath());
   }
 
   private void requireSame(String requestedId, String actualId) {
     if (!actualId.equals(requestedId)) {
       throw new WebApplicationException(Response.Status.NOT_FOUND);
     }
+  }
+
+  private ApiModelNode materialize(ApiModelNode node) {
+    String api = node.api();
+    if (api != null) {
+      api =
+          api.replace("{userId}", facade.user().getIdentity())
+              .replace("{accountId}", facade.buyerAccount().getIdentity())
+              .replace("{storeId}", facade.sellerStore().getIdentity());
+    }
+    return new ApiModelNode(
+        node.rel(), api, node.cycle(), node.links().stream().map(this::materialize).toList());
   }
 
   public record CreatePurchaseRequest(String productName, int quantity) {}

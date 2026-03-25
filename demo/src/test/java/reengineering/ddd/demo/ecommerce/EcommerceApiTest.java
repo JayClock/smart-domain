@@ -51,6 +51,28 @@ class EcommerceApiTest {
   }
 
   @Test
+  void should_expose_agent_tree_for_ai_navigation() throws Exception {
+    ResponseEntity<String> response =
+        restTemplate.exchange(
+            "http://localhost:" + port + "/api/ecommerce/agent-tree",
+            HttpMethod.GET,
+            new HttpEntity<>(new HttpHeaders()),
+            String.class);
+
+    assertThat(response.getStatusCodeValue()).isEqualTo(200);
+
+    JsonNode tree = objectMapper.readTree(response.getBody());
+    assertThat(tree.path("rel").asText()).isEqualTo("self");
+    assertThat(tree.path("api").asText()).isEqualTo("/api/ecommerce");
+    assertThat(findLink(tree, "buyer-account").path("api").asText())
+        .isEqualTo("/api/ecommerce/buyer-accounts/1");
+    assertThat(findLink(findLink(tree, "buyer-account"), "create-purchase").path("api").asText())
+        .isEqualTo("/api/ecommerce/buyer-accounts/1/purchases");
+    assertThat(findLink(findLink(tree, "seller-store"), "create-listing").path("api").asText())
+        .isEqualTo("/api/ecommerce/seller-stores/1/listings");
+  }
+
+  @Test
   void should_create_purchases_and_listings_via_api() throws Exception {
     ResponseEntity<String> rootResponse =
         restTemplate.exchange(
@@ -109,5 +131,49 @@ class EcommerceApiTest {
 
     assertThat(seller.path("listings")).hasSize(2);
     assertThat(buyer.path("purchases")).hasSize(2);
+  }
+
+  @Test
+  void should_expose_templates_for_agent_actions() throws Exception {
+    HttpHeaders headers = new HttpHeaders();
+    headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+
+    ResponseEntity<String> buyerResponse =
+        restTemplate.exchange(
+            "http://localhost:" + port + "/api/ecommerce/buyer-accounts/1",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            String.class);
+
+    ResponseEntity<String> sellerResponse =
+        restTemplate.exchange(
+            "http://localhost:" + port + "/api/ecommerce/seller-stores/1",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            String.class);
+
+    JsonNode buyer = objectMapper.readTree(buyerResponse.getBody());
+    JsonNode seller = objectMapper.readTree(sellerResponse.getBody());
+
+    assertThat(buyer.path("_links").has("purchases")).isTrue();
+    assertThat(buyer.path("_templates").has("default")).isTrue();
+    assertThat(buyer.path("_templates").path("default").path("target").asText())
+        .isEqualTo("/api/ecommerce/buyer-accounts/1/purchases");
+    assertThat(buyer.path("_templates").path("default").path("properties")).hasSize(2);
+
+    assertThat(seller.path("_links").has("listings")).isTrue();
+    assertThat(seller.path("_templates").has("default")).isTrue();
+    assertThat(seller.path("_templates").path("default").path("target").asText())
+        .isEqualTo("/api/ecommerce/seller-stores/1/listings");
+    assertThat(seller.path("_templates").path("default").path("properties")).hasSize(3);
+  }
+
+  private JsonNode findLink(JsonNode node, String rel) {
+    for (JsonNode child : node.path("links")) {
+      if (rel.equals(child.path("rel").asText())) {
+        return child;
+      }
+    }
+    throw new AssertionError("Link not found: " + rel);
   }
 }

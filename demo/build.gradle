@@ -1,4 +1,9 @@
+plugins {
+    id 'org.springframework.boot' version '3.5.9'
+}
+
 dependencies {
+    implementation project(rootProject.ext.smartDomainProjectPath('api-model-tree-tool'))
     implementation project(rootProject.ext.smartDomainProjectPath('api-spring-boot-starter'))
     implementation project(rootProject.ext.smartDomainProjectPath('core'))
     implementation project(rootProject.ext.smartDomainProjectPath('mybatis'))

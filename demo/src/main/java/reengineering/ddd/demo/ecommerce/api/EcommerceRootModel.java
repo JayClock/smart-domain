@@ -1,5 +1,6 @@
 package reengineering.ddd.demo.ecommerce.api;
 
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.RepresentationModel;
 import reengineering.ddd.demo.ecommerce.model.User;
 
@@ -18,11 +19,22 @@ public class EcommerceRootModel extends RepresentationModel<EcommerceRootModel> 
   }
 
   public static EcommerceRootModel of(User user, String buyerAccountId, String sellerStoreId) {
-    return new EcommerceRootModel(
+    EcommerceRootModel model =
+        new EcommerceRootModel(
         user.getIdentity(),
         user.getDescription().name(),
         buyerAccountId,
         sellerStoreId);
+    model.add(Link.of(EcommerceApiTemplates.root().build().getPath()).withSelfRel());
+    model.add(
+        Link.of(EcommerceApiTemplates.user(user.getIdentity()).build().getPath()).withRel("user"));
+    model.add(
+        Link.of(EcommerceApiTemplates.buyerAccount(buyerAccountId).build().getPath())
+            .withRel("buyer-account"));
+    model.add(
+        Link.of(EcommerceApiTemplates.sellerStore(sellerStoreId).build().getPath())
+            .withRel("seller-store"));
+    return model;
   }
 
   public String getUserId() {

@@ -99,6 +99,7 @@ The ecommerce demo adds:
 - `PurchasingContext` and `SalesContext` built on `ContextSwitcher`
 - `Buyer` and `Seller` role objects bound to `User + BuyerAccount/SellerStore`
 - a REST API sample under `ecommerce/api`
+- an AI-facing navigation tree endpoint at `/api/ecommerce/agent-tree`
 - a starter descriptor under `ecommerce/mybatis/config`
 
 That makes the demo cover three Smart Domain ideas in one place:
@@ -121,3 +122,43 @@ That means a new project only needs to keep three things aligned:
 1. Model fields and wide interfaces
 2. Association adapter classes and mapper files
 3. One `@EnableSmartDomainMybatis(...)` descriptor that points at the adapter package and leaf entities
+
+## AI agent MVP
+
+The ecommerce demo now exposes a minimal AI-facing tree endpoint:
+
+- `GET /api/ecommerce/agent-tree`
+
+The endpoint returns a minimal JSON tree made of:
+
+- `rel`
+- `api`
+- `links`
+- optional `cycle`
+
+The resource endpoints used by the JS MVP expose:
+
+- `_links` for navigable rels
+- `_templates` for action targets such as `POST /buyer-accounts/{id}/purchases`
+
+You can run the demo and the JavaScript recursion example with:
+
+```bash
+./gradlew :demo:bootRun
+node demo/examples/ecommerce-agent-mvp.js
+```
+
+The JS example simulates an AI-produced nested path such as:
+
+```json
+{
+  "rel": "seller-store",
+  "next": {
+    "rel": "create-listing"
+  }
+}
+```
+
+It then resolves each `rel` against the tree, checks whether the current resource exposes the
+required `_links`, finds the matching `_templates` entry by rel or by template target, generates
+the request body from template properties, and recursively executes the live REST API.

@@ -479,9 +479,18 @@ class ApiModelTreeTool {
       }
 
       String methodName = call.getNameAsString();
-      if ("getPath".equals(methodName) || "build".equals(methodName) || "queryParam".equals(methodName)) {
+      if ("getPath".equals(methodName)
+          || "build".equals(methodName)
+          || "queryParam".equals(methodName)
+          || "resolveTemplate".equals(methodName)
+          || "resolveTemplateFromEncoded".equals(methodName)
+          || "resolveTemplates".equals(methodName)) {
         return call.getScope()
             .flatMap(scope -> resolveBuilderState(sourceContext, context, scope, stack));
+      }
+
+      if ("fromPath".equals(methodName) || "fromUri".equals(methodName)) {
+        return stringArgument(call, 0).map(path -> new BuilderState(normalizePath(path), Endpoint.none()));
       }
 
       if ("getBaseUriBuilder".equals(methodName) || "getRequestUri".equals(methodName)) {
@@ -502,7 +511,7 @@ class ApiModelTreeTool {
         String scopeName = scopeName(call.getScope().orElseThrow());
         if (scopeName.endsWith("ApiTemplates")) {
           return resolveUriBuilderMethod(
-              resolveClassSourceContext(sourceContext, "ApiTemplates"), methodName, stack);
+              resolveClassSourceContext(sourceContext, scopeName), methodName, stack);
         }
       } else {
         return resolveUriBuilderMethod(Optional.of(sourceContext), methodName, stack);

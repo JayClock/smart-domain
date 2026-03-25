@@ -3,6 +3,8 @@ package reengineering.ddd.demo.ecommerce.api;
 import java.util.List;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.mediatype.Affordances;
+import org.springframework.http.HttpMethod;
 import reengineering.ddd.demo.ecommerce.model.SellerStore;
 
 public class SellerStoreModel extends RepresentationModel<SellerStoreModel> {
@@ -16,8 +18,9 @@ public class SellerStoreModel extends RepresentationModel<SellerStoreModel> {
     this.listings = listings;
   }
 
-  public static SellerStoreModel of(
-      SellerStore store, String selfHref, String listingBaseHref) {
+  public static SellerStoreModel of(SellerStore store) {
+    String selfHref = EcommerceApiTemplates.sellerStore(store.getIdentity()).build().getPath();
+    String listingsHref = EcommerceApiTemplates.createListing(store.getIdentity()).build().getPath();
     SellerStoreModel model =
         new SellerStoreModel(
             store.getIdentity(),
@@ -26,9 +29,18 @@ public class SellerStoreModel extends RepresentationModel<SellerStoreModel> {
                 .map(
                     listing ->
                         ListingModel.of(
-                            listing, listingBaseHref + "/listings/" + listing.getIdentity()))
+                            listing,
+                            EcommerceApiTemplates.listing(store.getIdentity(), listing.getIdentity())
+                                .build()
+                                .getPath()))
                 .toList());
     model.add(Link.of(selfHref).withSelfRel());
+    model.add(
+        Affordances.of(Link.of(listingsHref).withRel("listings"))
+            .afford(HttpMethod.POST)
+            .withInput(EcommerceApi.CreateListingRequest.class)
+            .withName("create-listing")
+            .toLink());
     return model;
   }
 

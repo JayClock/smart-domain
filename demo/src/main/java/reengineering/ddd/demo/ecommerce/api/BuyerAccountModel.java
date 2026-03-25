@@ -3,6 +3,8 @@ package reengineering.ddd.demo.ecommerce.api;
 import java.util.List;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.mediatype.Affordances;
+import org.springframework.http.HttpMethod;
 import reengineering.ddd.demo.ecommerce.model.BuyerAccount;
 
 public class BuyerAccountModel extends RepresentationModel<BuyerAccountModel> {
@@ -16,8 +18,10 @@ public class BuyerAccountModel extends RepresentationModel<BuyerAccountModel> {
     this.purchases = purchases;
   }
 
-  public static BuyerAccountModel of(
-      BuyerAccount account, String selfHref, String purchaseBaseHref) {
+  public static BuyerAccountModel of(BuyerAccount account) {
+    String selfHref = EcommerceApiTemplates.buyerAccount(account.getIdentity()).build().getPath();
+    String purchasesHref =
+        EcommerceApiTemplates.createPurchase(account.getIdentity()).build().getPath();
     BuyerAccountModel model =
         new BuyerAccountModel(
             account.getIdentity(),
@@ -26,9 +30,19 @@ public class BuyerAccountModel extends RepresentationModel<BuyerAccountModel> {
                 .map(
                     purchase ->
                         PurchaseModel.of(
-                            purchase, purchaseBaseHref + "/purchases/" + purchase.getIdentity()))
+                            purchase,
+                            EcommerceApiTemplates.purchase(
+                                    account.getIdentity(), purchase.getIdentity())
+                                .build()
+                                .getPath()))
                 .toList());
     model.add(Link.of(selfHref).withSelfRel());
+    model.add(
+        Affordances.of(Link.of(purchasesHref).withRel("purchases"))
+            .afford(HttpMethod.POST)
+            .withInput(EcommerceApi.CreatePurchaseRequest.class)
+            .withName("create-purchase")
+            .toLink());
     return model;
   }
 
