@@ -19,7 +19,8 @@ class EcommerceMybatisStarterDemoTest {
   @Test
   void should_register_ecommerce_demo_mybatis_configuration_from_annotation() throws Exception {
     try (AnnotationConfigApplicationContext context =
-        new AnnotationConfigApplicationContext(EcommerceDemoSmartDomainMybatisConfiguration.class)) {
+        new AnnotationConfigApplicationContext(
+            EcommerceDemoSmartDomainMybatisConfiguration.class)) {
       SmartDomainMybatisConfigurer configurer = context.getBean(SmartDomainMybatisConfigurer.class);
       Object hydrator = context.getBean("genericEntityHydrator");
       CacheManager cacheManager = context.getBean(CacheManager.class);
@@ -30,7 +31,8 @@ class EcommerceMybatisStarterDemoTest {
       assertEquals(List.of(Listing.class), configurer.leafEntityTypes());
       assertNotNull(hydrator);
       assertEquals("HydratingCacheManager", cacheManager.getClass().getSimpleName());
-      assertTrue(registeredEntityTypes(hydrator).containsAll(List.of(SellerStore.class, Listing.class)));
+      assertTrue(
+          registeredEntityTypes(hydrator).containsAll(List.of(SellerStore.class, Listing.class)));
     }
   }
 

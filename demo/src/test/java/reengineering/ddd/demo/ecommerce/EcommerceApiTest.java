@@ -89,7 +89,11 @@ class EcommerceApiTest {
 
     ResponseEntity<String> listingResponse =
         restTemplate.exchange(
-            "http://localhost:" + port + "/api/ecommerce/seller-stores/" + sellerStoreId + "/listings",
+            "http://localhost:"
+                + port
+                + "/api/ecommerce/seller-stores/"
+                + sellerStoreId
+                + "/listings",
             HttpMethod.POST,
             new HttpEntity<>(
                 """
@@ -100,7 +104,11 @@ class EcommerceApiTest {
 
     ResponseEntity<String> purchaseResponse =
         restTemplate.exchange(
-            "http://localhost:" + port + "/api/ecommerce/buyer-accounts/" + buyerAccountId + "/purchases",
+            "http://localhost:"
+                + port
+                + "/api/ecommerce/buyer-accounts/"
+                + buyerAccountId
+                + "/purchases",
             HttpMethod.POST,
             new HttpEntity<>(
                 """

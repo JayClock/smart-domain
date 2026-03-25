@@ -1,7 +1,7 @@
 package reengineering.ddd.demo.ecommerce.mybatis;
 
-import java.util.Optional;
 import io.github.jayclock.smartdomain.mybatis.support.IdHolder;
+import java.util.Optional;
 import org.springframework.stereotype.Component;
 import reengineering.ddd.demo.ecommerce.description.SellerStoreDescription;
 import reengineering.ddd.demo.ecommerce.model.SellerStore;
@@ -15,8 +15,7 @@ public class MybatisSellerStores implements SellerStores {
   private final SellerStoresMapper storesMapper;
   private final SellerListingsMapper listingsMapper;
 
-  public MybatisSellerStores(
-      SellerStoresMapper storesMapper, SellerListingsMapper listingsMapper) {
+  public MybatisSellerStores(SellerStoresMapper storesMapper, SellerListingsMapper listingsMapper) {
     this.storesMapper = storesMapper;
     this.listingsMapper = listingsMapper;
   }
@@ -28,7 +27,9 @@ public class MybatisSellerStores implements SellerStores {
     if (row == null) {
       IdHolder holder = new IdHolder();
       storesMapper.insertStore(
-          holder, Integer.parseInt(actor.getIdentity()), new SellerStoreDescription(actor.getDescription().name() + " Store"));
+          holder,
+          Integer.parseInt(actor.getIdentity()),
+          new SellerStoreDescription(actor.getDescription().name() + " Store"));
       row = storesMapper.findStoreById(holder.id());
     }
     return rehydrate(row);

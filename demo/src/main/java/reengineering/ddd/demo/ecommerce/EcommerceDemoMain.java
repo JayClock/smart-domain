@@ -1,9 +1,9 @@
 package reengineering.ddd.demo.ecommerce;
 
+import reengineering.ddd.demo.ecommerce.api.InMemorySalesMappers;
 import reengineering.ddd.demo.ecommerce.description.ListingDescription;
 import reengineering.ddd.demo.ecommerce.description.PurchaseDescription;
 import reengineering.ddd.demo.ecommerce.description.UserDescription;
-import reengineering.ddd.demo.ecommerce.api.InMemorySalesMappers;
 import reengineering.ddd.demo.ecommerce.memory.DefaultPurchasingContext;
 import reengineering.ddd.demo.ecommerce.memory.InMemoryBuyerAccounts;
 import reengineering.ddd.demo.ecommerce.memory.InMemoryUsers;
@@ -30,7 +30,8 @@ public class EcommerceDemoMain {
 
     System.out.println("Buyer role: " + buyer.getClass().getSimpleName());
     System.out.println("Seller role: " + seller.getClass().getSimpleName());
-    System.out.println("Purchases adapter: " + buyer.account().purchases().getClass().getSimpleName());
+    System.out.println(
+        "Purchases adapter: " + buyer.account().purchases().getClass().getSimpleName());
     System.out.println("Listings adapter: " + seller.store().listings().getClass().getSimpleName());
   }
 }

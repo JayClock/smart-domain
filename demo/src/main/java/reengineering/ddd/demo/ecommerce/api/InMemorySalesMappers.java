@@ -66,7 +66,9 @@ public class InMemorySalesMappers implements SellerStoresMapper, SellerListingsM
   @Override
   public int countListingsByStore(int sellerStoreId) {
     return (int)
-        listings.values().stream().filter(record -> record.sellerStoreId() == sellerStoreId).count();
+        listings.values().stream()
+            .filter(record -> record.sellerStoreId() == sellerStoreId)
+            .count();
   }
 
   @Override

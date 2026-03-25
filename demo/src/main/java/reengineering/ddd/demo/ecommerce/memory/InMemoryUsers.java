@@ -22,6 +22,7 @@ public class InMemoryUsers implements Users {
 
   @Override
   public Optional<User> findByIdentity(String identity) {
-    return Optional.ofNullable(users.get(identity)).map(description -> new User(identity, description));
+    return Optional.ofNullable(users.get(identity))
+        .map(description -> new User(identity, description));
   }
 }

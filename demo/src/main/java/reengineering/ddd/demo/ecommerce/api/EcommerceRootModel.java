@@ -21,10 +21,7 @@ public class EcommerceRootModel extends RepresentationModel<EcommerceRootModel> 
   public static EcommerceRootModel of(User user, String buyerAccountId, String sellerStoreId) {
     EcommerceRootModel model =
         new EcommerceRootModel(
-        user.getIdentity(),
-        user.getDescription().name(),
-        buyerAccountId,
-        sellerStoreId);
+            user.getIdentity(), user.getDescription().name(), buyerAccountId, sellerStoreId);
     model.add(Link.of(EcommerceApiTemplates.root().build().getPath()).withSelfRel());
     model.add(
         Link.of(EcommerceApiTemplates.user(user.getIdentity()).build().getPath()).withRel("user"));

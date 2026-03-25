@@ -39,9 +39,7 @@ public final class EcommerceApiTemplates {
   }
 
   public static UriBuilder createListing(String storeId) {
-    return root()
-        .path(EcommerceApi.class, "createListing")
-        .resolveTemplate("storeId", storeId);
+    return root().path(EcommerceApi.class, "createListing").resolveTemplate("storeId", storeId);
   }
 
   public static UriBuilder listing(String storeId, String listingId) {

@@ -1,9 +1,9 @@
 package reengineering.ddd.demo.ecommerce.api;
 
+import io.github.jayclock.smartdomain.api.hateoas.media.VendorMediaType;
 import io.github.jayclock.smartdomain.tool.apimodeltree.ApiModelNode;
 import io.github.jayclock.smartdomain.tool.apimodeltree.ApiModelTreeOptions;
 import io.github.jayclock.smartdomain.tool.apimodeltree.SmartDomainTools;
-import io.github.jayclock.smartdomain.api.hateoas.media.VendorMediaType;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
@@ -15,7 +15,6 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -30,7 +29,8 @@ public class EcommerceApi {
   @GET
   @Path("agent-tree")
   @Produces(MediaType.APPLICATION_JSON)
-  public ApiModelNode agentTree(@DefaultValue("false") @QueryParam("includeCycle") boolean includeCycle) {
+  public ApiModelNode agentTree(
+      @DefaultValue("false") @QueryParam("includeCycle") boolean includeCycle) {
     return materialize(
         SmartDomainTools.apiModelTree(
             EcommerceRootModel.class, new ApiModelTreeOptions(includeCycle)));
@@ -64,12 +64,13 @@ public class EcommerceApi {
   @Consumes(MediaType.APPLICATION_JSON)
   @VendorMediaType(EcommerceMediaTypes.PURCHASE)
   public Response createPurchase(
-      @PathParam("accountId") String accountId,
-      CreatePurchaseRequest request) {
+      @PathParam("accountId") String accountId, CreatePurchaseRequest request) {
     requireSame(accountId, facade.buyerAccount().getIdentity());
     var created = facade.buy(request.productName(), request.quantity());
-    String href = EcommerceApiTemplates.purchase(accountId, created.getIdentity()).build().getPath();
-    return Response.created(EcommerceApiTemplates.purchase(accountId, created.getIdentity()).build())
+    String href =
+        EcommerceApiTemplates.purchase(accountId, created.getIdentity()).build().getPath();
+    return Response.created(
+            EcommerceApiTemplates.purchase(accountId, created.getIdentity()).build())
         .entity(PurchaseModel.of(created, href))
         .build();
   }
@@ -86,7 +87,8 @@ public class EcommerceApi {
             .purchases()
             .findByIdentity(purchaseId)
             .orElseThrow(() -> new WebApplicationException(Response.Status.NOT_FOUND));
-    return PurchaseModel.of(purchase, EcommerceApiTemplates.purchase(accountId, purchaseId).build().getPath());
+    return PurchaseModel.of(
+        purchase, EcommerceApiTemplates.purchase(accountId, purchaseId).build().getPath());
   }
 
   @GET
@@ -102,8 +104,7 @@ public class EcommerceApi {
   @Consumes(MediaType.APPLICATION_JSON)
   @VendorMediaType(EcommerceMediaTypes.LISTING)
   public Response createListing(
-      @PathParam("storeId") String storeId,
-      CreateListingRequest request) {
+      @PathParam("storeId") String storeId, CreateListingRequest request) {
     requireSame(storeId, facade.sellerStore().getIdentity());
     var created = facade.sell(request.productName(), request.inventory(), request.unitPrice());
     String href = EcommerceApiTemplates.listing(storeId, created.getIdentity()).build().getPath();
@@ -124,7 +125,8 @@ public class EcommerceApi {
             .listings()
             .findByIdentity(listingId)
             .orElseThrow(() -> new WebApplicationException(Response.Status.NOT_FOUND));
-    return ListingModel.of(listing, EcommerceApiTemplates.listing(storeId, listingId).build().getPath());
+    return ListingModel.of(
+        listing, EcommerceApiTemplates.listing(storeId, listingId).build().getPath());
   }
 
   private void requireSame(String requestedId, String actualId) {

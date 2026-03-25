@@ -20,7 +20,8 @@ public class SellerStoreModel extends RepresentationModel<SellerStoreModel> {
 
   public static SellerStoreModel of(SellerStore store) {
     String selfHref = EcommerceApiTemplates.sellerStore(store.getIdentity()).build().getPath();
-    String listingsHref = EcommerceApiTemplates.createListing(store.getIdentity()).build().getPath();
+    String listingsHref =
+        EcommerceApiTemplates.createListing(store.getIdentity()).build().getPath();
     SellerStoreModel model =
         new SellerStoreModel(
             store.getIdentity(),
@@ -30,7 +31,8 @@ public class SellerStoreModel extends RepresentationModel<SellerStoreModel> {
                     listing ->
                         ListingModel.of(
                             listing,
-                            EcommerceApiTemplates.listing(store.getIdentity(), listing.getIdentity())
+                            EcommerceApiTemplates.listing(
+                                    store.getIdentity(), listing.getIdentity())
                                 .build()
                                 .getPath()))
                 .toList());
