@@ -1,164 +1,189 @@
-# Smart Domain Basic Demo
+# Smart Domain Accounting Demo
 
-This module is the smallest runnable example of the Smart Domain pattern extracted from Team AI.
+This module is the main runnable example of the Smart Domain pattern.
 
-It demonstrates one-to-one correspondence across three layers:
+It uses the accounting case from the public `Accounting` reference and extends it with Smart
+Domain context switching.
 
-| Model Layer | Wide Interface | Persistence Adapter | Storage Record |
-| --- | --- | --- | --- |
-| `Library.shelves` | `Library.Shelves` | `LibraryShelves` | `ShelfRecord` |
-| `Shelf.books` | `Shelf.Books` | `ShelfBooks` | `BookRecord` |
-| `Libraries` | `Libraries` | `InMemoryLibraries` | `LibraryRecord` |
+## Domain Overview
 
-It also includes a MyBatis-oriented template:
+The demo has one business root and four context roles:
 
-| Model Layer | MyBatis Association Adapter | Mapper | XML Snippet |
-| --- | --- | --- | --- |
-| `Library.shelves` | `mybatis.LibraryShelves` | `LibraryShelvesMapper` | `library-demo/LibraryShelvesMapper.xml` |
-| `Shelf.books` | `mybatis.ShelfBooks` | `ShelfBooksMapper` | `library-demo/ShelfBooksMapper.xml` |
-| `Libraries` | `mybatis.MybatisLibraries` | `LibrariesMapper` | `library-demo/LibrariesMapper.xml` |
+| Area | Role | Domain Entry | Adapter | Lifecycle |
+| --- | --- | --- | --- | --- |
+| Bookkeeping | `Bookkeeper` | `Customer.sourceEvidences` | `memory.InMemoryCustomers#CustomerSourceEvidences` | aggregated |
+| Audit | `Auditor` | `Customer.accounts` | `memory.InMemoryCustomers#CustomerAccounts` | root association |
+| Account analysis | `Accountant` | `Account.transactions` | `mybatis.AccountTransactions` | reference |
+| Evidence review | `EvidenceReviewer` | `SourceEvidence.transactions` | `memory.SourceEvidenceTransactions` | aggregated |
 
-And it includes a starter-oriented template for bootstrapping the runtime:
+This keeps one coherent business story while still showing mixed persistence styles.
 
-| Runtime Layer | Demo Type | Declares |
-| --- | --- | --- |
-| `mybatis/config/LibraryDemoSmartDomainMybatisConfiguration` | `@EnableSmartDomainMybatis` | `associationBasePackages = "reengineering.ddd.demo.library.mybatis"` |
-| `mybatis/config/LibraryDemoSmartDomainMybatisConfiguration` | `leafEntityTypes` | `Book.class` |
-
-## Why this demo exists
+## Why This Demo Exists
 
 - Keep the example independent from Team AI business concepts
 - Show how `HasMany` becomes a first-class domain object
-- Show that every model association can have a matching persistence adapter
-- Provide a copyable template for future projects
+- Show how `ContextSwitcher` produces role objects
+- Show how one accounting model can mix aggregated and reference lifecycle associations
+- Provide one copyable accounting template for future projects
 
 ## Structure
 
 ```text
 demo/
-├── description/
-│   ├── LibraryDescription
-│   ├── ShelfDescription
-│   └── BookDescription
-├── model/
-│   ├── Library
-│   ├── Shelf
-│   ├── Book
-│   └── Libraries
-├── memory/
-    ├── InMemoryLibraries
-    ├── LibraryShelves
-    ├── ShelfBooks
-    └── MemoryAssociation
-└── mybatis/
-    ├── MybatisLibraries
-    ├── LibraryShelves
-    ├── ShelfBooks
-    ├── config/
-    ├── mappers/
-    └── resources/library-demo/*.xml
+└── accounting/
+    ├── description/
+    │   ├── CustomerDescription
+    │   ├── AccountDescription
+    │   ├── SalesSettlementDescription
+    │   ├── TransactionDescription
+    │   └── OperatorDescription
+    ├── model/
+    │   ├── Customer
+    │   ├── Account
+    │   ├── SourceEvidence
+    │   ├── SalesSettlement
+    │   ├── Transaction
+    │   ├── Operator
+    │   ├── Bookkeeper
+    │   ├── Auditor
+    │   ├── BookkeepingContext
+    │   └── AuditContext
+    ├── memory/
+    │   ├── InMemoryCustomers
+    │   ├── InMemoryOperators
+    │   ├── CustomerAssignments
+    │   ├── SourceEvidenceTransactions
+    │   ├── DefaultBookkeepingContext
+    │   └── DefaultAuditContext
+    ├── mybatis/
+    │   ├── AccountingLedgerMapper
+    │   ├── AccountTransactions
+    │   └── config/AccountingDemoSmartDomainMybatisConfiguration
+    └── api/
+        ├── AccountingApi
+        ├── AccountingRootModel
+        ├── CustomerModel
+        ├── AccountModel
+        ├── SourceEvidenceModel
+        ├── TransactionModel
+        ├── AccountingMediaTypes
+        └── AccountingDemoApplication
 ```
 
-## The correspondence rule
+## The Correspondence Rule
 
 The pattern used in this demo is:
 
-1. The entity owns a field like `private Shelves shelves;`
-2. The entity exposes a narrow interface like `HasMany<String, Shelf> shelves()`
-3. The entity defines a wide interface like `interface Shelves extends HasMany<String, Shelf> { ... }`
-4. The persistence adapter implements that wide interface with a matching class name like `LibraryShelves`
-5. The starter config points to the adapter package and leaf entities with `@EnableSmartDomainMybatis`
+1. the entity owns a field like `private Transactions transactions;`
+2. the entity exposes a narrow interface like `HasMany<String, Transaction> transactions()`
+3. the entity defines a wide interface like `interface Transactions extends HasMany<String, Transaction> { ... }`
+4. the persistence adapter implements that wide interface with a matching class name like `AccountTransactions`
+5. the starter config points to the adapter package and leaf entities with `@EnableSmartDomainMybatis`
 
 That naming rule is what keeps the model layer and persistence layer aligned.
 
-## MyBatis correspondence example
+## Accounting Example
 
-The MyBatis template in this module keeps the same naming and ownership rule:
+The accounting side uses the original association shape from the reference repository:
 
-- Model field: `Library.shelves`
-- Wide interface: `Library.Shelves`
-- Adapter class: `reengineering.ddd.demo.library.mybatis.LibraryShelves`
-- Mapper interface: `LibraryShelvesMapper`
-- Mapper XML association target: `javaType="reengineering.ddd.demo.library.mybatis.LibraryShelves"`
+- `Customer.sourceEvidences`
+- `Customer.accounts`
+- `Account.transactions`
+- `SourceEvidence.transactions`
 
-The same rule applies to `Shelf.books -> ShelfBooks`.
+The central behavior is `Customer.record(...)`, which:
 
-This is intentionally parallel to the Team AI production pattern, but with a much smaller model.
+1. creates a source evidence such as `SalesSettlement`
+2. asks the evidence to materialize transaction descriptions
+3. writes those transactions into the target account associations
+4. updates account balance in the same domain flow
 
-## Ecommerce context demo
+Relevant files:
 
-This module now also includes an `ecommerce` demo that shows context roles and mixed persistence:
+- `src/main/java/reengineering/ddd/demo/accounting/model/Customer.java`
+- `src/main/java/reengineering/ddd/demo/accounting/model/Account.java`
+- `src/main/java/reengineering/ddd/demo/accounting/model/SalesSettlement.java`
+- `src/main/java/reengineering/ddd/demo/accounting/model/Transaction.java`
 
-| Context | Actor Role | Domain Entry | Association Adapter | Persistence Style |
-| --- | --- | --- | --- | --- |
-| Purchasing | `Buyer` | `BuyerAccount.purchases` | `memory.BuyerPurchases` | In-memory |
-| Sales | `Seller` | `SellerStore.listings` | `mybatis.SellerListings` | MyBatis |
+## Context Switching Example
 
-The ecommerce demo adds:
+This demo adds context roles on top of the accounting model:
 
-- `PurchasingContext` and `SalesContext` built on `ContextSwitcher`
-- `Buyer` and `Seller` role objects bound to `User + BuyerAccount/SellerStore`
-- a REST API sample under `ecommerce/api`
-- an AI-facing navigation tree endpoint at `/api/ecommerce/agent-tree`
-- a starter descriptor under `ecommerce/mybatis/config`
+- `BookkeepingContext` switches `Operator -> Customer -> Bookkeeper`
+- `AuditContext` switches `Operator -> Customer -> Auditor`
+- `AccountContext` switches `Operator -> Account -> Accountant`
+- `EvidenceReviewContext` switches `Operator -> SourceEvidence -> EvidenceReviewer`
 
-That makes the demo cover three Smart Domain ideas in one place:
+The `Bookkeeper` role records source evidences. The `Auditor` role reads accounts. The
+`Accountant` role works directly inside an `Account`, and `EvidenceReviewer` works directly inside
+a `SourceEvidence`. This creates layered context switching instead of a single flat role lookup.
 
-1. association objects
-2. context-specific role switching
-3. HATEOAS-first API exposure
+Relevant files:
 
-## Starter correspondence example
+- `src/main/java/reengineering/ddd/demo/accounting/model/Bookkeeper.java`
+- `src/main/java/reengineering/ddd/demo/accounting/model/Auditor.java`
+- `src/main/java/reengineering/ddd/demo/accounting/model/Accountant.java`
+- `src/main/java/reengineering/ddd/demo/accounting/model/EvidenceReviewer.java`
+- `src/main/java/reengineering/ddd/demo/accounting/memory/DefaultBookkeepingContext.java`
+- `src/main/java/reengineering/ddd/demo/accounting/memory/DefaultAuditContext.java`
+- `src/main/java/reengineering/ddd/demo/accounting/memory/DefaultAccountContext.java`
+- `src/main/java/reengineering/ddd/demo/accounting/memory/DefaultEvidenceReviewContext.java`
 
-The starter demo adds the runtime layer without introducing Team AI business packages:
+## Runtime Correspondence Example
 
-- Model ownership: `Library.shelves`, `Shelf.books`
-- Association scan root: `reengineering.ddd.demo.library.mybatis`
-- Leaf entity registration: `Book.class`
-- Starter descriptor: `mybatis.config.LibraryDemoSmartDomainMybatisConfiguration`
+The starter layer adds runtime wiring without introducing Team AI business packages:
 
-That means a new project only needs to keep three things aligned:
+- Association scan root: `reengineering.ddd.demo.accounting.mybatis`
+- Leaf entity registration: `Transaction.class`
+- Starter descriptor: `AccountingDemoSmartDomainMybatisConfiguration`
 
-1. Model fields and wide interfaces
-2. Association adapter classes and mapper files
-3. One `@EnableSmartDomainMybatis(...)` descriptor that points at the adapter package and leaf entities
+## REST API Example
 
-## AI agent MVP
+The accounting demo also exposes a HATEOAS-first API:
 
-The ecommerce demo now exposes a minimal AI-facing tree endpoint:
+- `GET /api/accounting`
+- `GET /api/accounting/operators/{operatorId}`
+- `GET /api/accounting/customers/{customerId}`
+- `POST /api/accounting/customers/{customerId}/source-evidences/sales-settlements`
+- `GET /api/accounting/customers/{customerId}/accounts/{accountId}`
+- `GET /api/accounting/customers/{customerId}/source-evidences/{evidenceId}`
+- `GET /api/accounting/agent-tree`
 
-- `GET /api/ecommerce/agent-tree`
+The API layer lives under:
 
-The endpoint returns a minimal JSON tree made of:
+- `src/main/java/reengineering/ddd/demo/accounting/api`
 
-- `rel`
-- `api`
-- `links`
-- optional `cycle`
+## Agent Tree Example
 
-The resource endpoints used by the JS MVP expose:
+The accounting demo keeps a runnable agent example that:
 
-- `_links` for navigable rels
-- `_templates` for action targets such as `POST /buyer-accounts/{id}/purchases`
+1. reads `/api/accounting/agent-tree`
+2. accepts AI-provided `agent-plan` step arrays
+3. resolves rel-by-rel navigation from the JSON tree
+4. follows `_links`
+5. finds HAL-FORMS templates by rel or target
+6. constructs request data from template properties
+7. posts or reads resources without hardcoding endpoint paths
+8. prints an execution trace and final resource summary for each plan
 
-You can run the demo and the JavaScript recursion example with:
+The current script includes multiple AI-provided plans:
+
+- record a sales settlement from `customer -> source-evidences`
+- inspect source evidence from `customer -> account -> transaction -> source-evidence`
+- pivot back to account from `customer -> source-evidence -> transaction -> account`
+
+Run it with:
 
 ```bash
+cd smart-domain
 ./gradlew :demo:bootRun
-node demo/examples/ecommerce-agent-mvp.js
+node demo/examples/accounting-agent-mvp.js
 ```
 
-The JS example simulates an AI-produced nested path such as:
+## Run The Demo
 
-```json
-{
-  "rel": "seller-store",
-  "next": {
-    "rel": "create-listing"
-  }
-}
+```bash
+cd smart-domain
+./gradlew :demo:bootRun
+./gradlew :demo:test --tests reengineering.ddd.demo.accounting.AccountingApiTest
 ```
-
-It then resolves each `rel` against the tree, checks whether the current resource exposes the
-required `_links`, finds the matching `_templates` entry by rel or by template target, generates
-the request body from template properties, and recursively executes the live REST API.

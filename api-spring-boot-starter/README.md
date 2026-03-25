@@ -15,7 +15,7 @@ Typical usage:
 smart-domain:
   api:
     schema-scan-packages:
-      - com.example.library.api
+      - com.example.accounting.api
 ```
 
 For a complete external consumer example, see [`samples/api-consumer`](../samples/api-consumer/README.md).

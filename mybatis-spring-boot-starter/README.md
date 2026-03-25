@@ -19,11 +19,11 @@ implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4'
 
 ```java
 @Configuration
-@MapperScan("com.example.library.mybatis.mappers")
+@MapperScan("com.example.accounting.mybatis")
 @EnableSmartDomainMybatis(
-    associationBasePackages = "com.example.library.mybatis",
-    leafEntityTypes = {Book.class})
-class LibraryMybatisConfiguration {
+    associationBasePackages = "com.example.accounting.mybatis",
+    leafEntityTypes = {Transaction.class})
+class AccountingMybatisConfiguration {
   @Bean
   DataSource dataSource() { ... }
 
@@ -39,10 +39,11 @@ annotated with `@AssociationMapping`.
 
 Typical values:
 
-- `com.example.library.mybatis`
-- `com.example.catalog.persistence.mybatis`
+- `com.example.accounting.mybatis`
+- `com.example.accounting.persistence.mybatis`
 
-Do not point it at your entire application root unless your association classes actually live there.
+Do not point it at your entire application root unless your association classes actually live
+there.
 
 ## How To Fill `leafEntityTypes`
 
@@ -51,9 +52,9 @@ hydrator.
 
 Typical examples:
 
-- `Book.class`
-- `Shelf.class`
-- `Author.class`
+- `Transaction.class`
+- `SalesSettlement.class`
+- `Operator.class`
 
 If an entity is only ever reached through `@AssociationMapping` discovery, it does not need to be
 repeated in `leafEntityTypes`.

@@ -3,6 +3,8 @@
 This guide shows the minimum path for exposing a Smart Domain backed REST API with Jersey, HAL and
 HAL-FORMS.
 
+The sample language here is the accounting case used by `demo/accounting`.
+
 ## 1. Add Dependencies
 
 Use the BOM and starter:
@@ -25,16 +27,16 @@ spring:
 smart-domain:
   api:
     schema-scan-packages:
-      - com.example.library.api
+      - com.example.accounting.api
 ```
 
 ## 3. Register Jersey Resources
 
 ```java
 @Configuration
-public class LibraryJerseyConfiguration extends ResourceConfig {
-  public LibraryJerseyConfiguration() {
-    register(BooksApi.class);
+public class AccountingJerseyConfiguration extends ResourceConfig {
+  public AccountingJerseyConfiguration() {
+    register(CustomersApi.class);
   }
 }
 ```
@@ -43,12 +45,12 @@ public class LibraryJerseyConfiguration extends ResourceConfig {
 
 ```java
 @Component
-@Path("books")
+@Path("customers/{customerId}/source-evidences/sales-settlements")
 @Produces(MediaType.APPLICATION_JSON)
-public class BooksApi {
+public class SalesSettlementsApi {
   @GET
-  @VendorMediaType(BookMediaTypes.BOOK_COLLECTION)
-  public CollectionModel<BookModel> findAll(@Context UriInfo uriInfo) {
+  @VendorMediaType(AccountingMediaTypes.SALES_SETTLEMENT_COLLECTION)
+  public CollectionModel<SourceEvidenceModel> findAll(@Context UriInfo uriInfo) {
     Link self = Link.of(uriInfo.getAbsolutePath().toString()).withSelfRel();
     return CollectionModel.of(List.of(), self);
   }
@@ -64,10 +66,13 @@ Use `HalFormsOptionsCustomizer` for inline or remote options:
 
 ```java
 @Component
-public class BookOptionsCustomizer implements HalFormsOptionsCustomizer {
+public class AccountingOptionsCustomizer implements HalFormsOptionsCustomizer {
   @Override
   public HalFormsConfiguration customize(HalFormsConfiguration config) {
-    return config.withOptions(CreateBookRequest.class, "genre", metadata -> ...);
+    return config.withOptions(
+        CreateSalesSettlementRequest.class,
+        "accountId",
+        metadata -> ...);
   }
 }
 ```
@@ -75,9 +80,10 @@ public class BookOptionsCustomizer implements HalFormsOptionsCustomizer {
 Use `@WithJsonSchema` on input fields that should expose JSON Schema in HAL-FORMS:
 
 ```java
-public record CreateBookRequest(
-    String title,
-    @WithJsonSchema(BookMetadata.class) BookMetadata metadata) {}
+public record CreateSalesSettlementRequest(
+    String orderId,
+    String accountId,
+    @WithJsonSchema(SettlementBreakdown.class) SettlementBreakdown breakdown) {}
 ```
 
 ## 6. Run The Published Sample

@@ -12,46 +12,37 @@ exists inside that context.
 - `ContextSwitcher<Actor, Context, Role>`
 - `ContextAccessDeniedException`
 
-## Recommended Shape
+## Accounting Demo Mapping
 
-Use a switcher to resolve an actor into a role object for a concrete context:
+The accounting demo uses:
 
-```java
-public interface ProjectParticipant extends ContextRole<User, Project> {}
-
-public interface ProjectContext extends ContextSwitcher<User, Project, ProjectParticipant> {}
-```
-
-Then keep behavior on the role object:
+- `Operator -> Customer -> Bookkeeper`
+- `Operator -> Customer -> Auditor`
+- `Operator -> Account -> Accountant`
+- `Operator -> SourceEvidence -> EvidenceReviewer`
 
 ```java
-public final class ProjectOwner implements ProjectParticipant {
-  @Override
-  public User actor() {
-    return user;
-  }
+public interface Bookkeeper extends ContextRole<Operator, Customer> {}
 
-  @Override
-  public Project context() {
-    return project;
-  }
-
-  public void deleteProject() {
-    projects.delete(project.getIdentity());
-  }
-}
+public interface BookkeepingContext
+    extends ContextSwitcher<Operator, Customer, Bookkeeper> {}
 ```
+
+The same shape is used for `Auditor`, `Accountant`, and `EvidenceReviewer`.
 
 ## Why It Exists
 
 - It replaces ad hoc `if (role == ...)` checks with explicit role objects.
 - It keeps context-aware behavior near the domain instead of pushing it into services.
-- It gives external products a reusable abstraction instead of forcing application-specific naming.
+- It lets one customer context expose multiple role-specific behaviors without inventing fake REST paths.
 
-## Team AI Mapping
+## Concrete Shape
 
-Team AI now treats:
+In the accounting demo:
 
-- `ProjectContext` as a `ContextSwitcher<User, Project, ProjectParticipant>`
-- `ProjectParticipant` as a `ContextRole<User, Project>`
-- `ProjectOwner`, `ProjectEditor`, and `ProjectViewer` as concrete context roles
+- `Bookkeeper.record(...)` records a `SalesSettlement` into a `Customer`
+- `Auditor.transactions(accountId)` reads `Account.transactions()` inside the same customer context
+- `Accountant.sourceEvidence(transactionId)` pivots from an `Account` context to the linked source evidence
+- `EvidenceReviewer.settlementAccount()` pivots from a `SourceEvidence` context back to the posting account
+
+That means your entity model stays entity-centric, while your behavior surface stays role-centric.

@@ -1,26 +1,36 @@
-# Smart Domain Naming Conventions
+# Naming Conventions
 
-Smart Domain keeps a 1:1 naming chain from domain model to persistence adapter.
+Smart Domain works best when the model field, wide interface, adapter, and starter package all use
+the same domain language.
 
-## Recommended Chain
+The accounting demo uses this correspondence:
 
-`Library.shelves -> LibraryShelves -> Mapper -> XML -> Starter`
+`Account.transactions -> AccountTransactions -> AccountingLedgerMapper -> Starter`
 
-## Rules
+## Rule
 
-- Association field names stay in the domain language: `Library.shelves`.
-- The adapter class mirrors the owner and field: `LibraryShelves`.
-- The MyBatis mapper follows the adapter name: `LibraryShelvesMapper`.
-- The XML file follows the mapper name: `LibraryShelvesMapper.xml`.
-- `@EnableSmartDomainMybatis` points `associationBasePackages` at the package where
-  `LibraryShelves` lives.
+- Association field names stay in the domain language: `Account.transactions`.
+- The adapter class mirrors the owner and field: `AccountTransactions`.
+- The mapper or backing persistence contract stays in the same ubiquitous language: `AccountingLedgerMapper`.
+- The starter scan root follows the same package: `com.example.accounting.mybatis`.
 
-## Example
+## Example Mapping
 
-| Layer | Example |
+| Layer | Name |
 | --- | --- |
-| Domain entity field | `Library.shelves` |
-| Association adapter | `LibraryShelves` |
-| Mapper interface | `LibraryShelvesMapper` |
-| Mapper XML | `LibraryShelvesMapper.xml` |
-| Starter scan root | `com.example.library.mybatis` |
+| Domain entity field | `Account.transactions` |
+| Wide interface | `Account.Transactions` |
+| Association adapter | `AccountTransactions` |
+| Mapper contract | `AccountingLedgerMapper` |
+| Starter scan root | `com.example.accounting.mybatis` |
+
+## Context Role Naming
+
+Use the same rule for context switching:
+
+- context interface: `BookkeepingContext`
+- role interface: `Bookkeeper`
+- context implementation: `DefaultBookkeepingContext`
+
+Do not mix generic names like `ManagerContext` or `RoleAdapter` if the domain already has better
+language.

@@ -15,19 +15,20 @@ class CoreOnlyConsumerTest {
 
   @Test
   void should_use_core_contract_without_team_ai_runtime() {
-    Book dune = new Book("book-1", "Dune");
-    Books books = new Books(List.of(dune));
+    Transaction transaction = new Transaction("tx-1", "CNY 1280.00");
+    Transactions transactions = new Transactions(List.of(transaction));
 
-    assertEquals(1, books.size());
-    assertEquals(Optional.of(dune), books.findByIdentity("book-1"));
-    assertTrue(books.stream().map(Book::getDescription).toList().contains("Dune"));
+    assertEquals(1, transactions.size());
+    assertEquals(Optional.of(transaction), transactions.findByIdentity("tx-1"));
+    assertTrue(
+        transactions.stream().map(Transaction::getDescription).toList().contains("CNY 1280.00"));
   }
 
-  private static final class Book implements Entity<String, String> {
+  private static final class Transaction implements Entity<String, String> {
     private final String identity;
     private final String description;
 
-    private Book(String identity, String description) {
+    private Transaction(String identity, String description) {
       this.identity = identity;
       this.description = description;
     }
@@ -43,36 +44,39 @@ class CoreOnlyConsumerTest {
     }
   }
 
-  private static final class Books implements Many<Book>, HasMany<String, Book> {
-    private final List<Book> books;
+  private static final class Transactions
+      implements Many<Transaction>, HasMany<String, Transaction> {
+    private final List<Transaction> transactions;
 
-    private Books(List<Book> books) {
-      this.books = books;
+    private Transactions(List<Transaction> transactions) {
+      this.transactions = transactions;
     }
 
     @Override
-    public Many<Book> findAll() {
+    public Many<Transaction> findAll() {
       return this;
     }
 
     @Override
-    public Optional<Book> findByIdentity(String identifier) {
-      return books.stream().filter(book -> book.getIdentity().equals(identifier)).findFirst();
+    public Optional<Transaction> findByIdentity(String identifier) {
+      return transactions.stream()
+          .filter(transaction -> transaction.getIdentity().equals(identifier))
+          .findFirst();
     }
 
     @Override
     public int size() {
-      return books.size();
+      return transactions.size();
     }
 
     @Override
-    public Many<Book> subCollection(int from, int to) {
-      return new Books(books.subList(from, to));
+    public Many<Transaction> subCollection(int from, int to) {
+      return new Transactions(transactions.subList(from, to));
     }
 
     @Override
-    public Iterator<Book> iterator() {
-      return books.iterator();
+    public Iterator<Transaction> iterator() {
+      return transactions.iterator();
     }
   }
 }

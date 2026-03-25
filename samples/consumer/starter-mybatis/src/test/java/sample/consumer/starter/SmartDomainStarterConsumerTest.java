@@ -32,8 +32,12 @@ class SmartDomainStarterConsumerTest {
       CacheManager cacheManager = context.getBean(CacheManager.class);
       PingMapper pingMapper = context.getBean(PingMapper.class);
 
-      assertTrue(hydrator.isEntity(new Library("library-1", new LibraryDescription("Central"), new LibraryShelves())));
-      assertTrue(hydrator.isEntity(new Shelf("shelf-1", new ShelfDescription("Sci-Fi"))));
+      assertTrue(
+          hydrator.isEntity(
+              new Account(
+                  "CASH-001", new AccountDescription("CNY 0.00"), new AccountTransactions())));
+      assertTrue(
+          hydrator.isEntity(new Transaction("TX-001", new TransactionDescription("CNY 100.00"))));
       assertEquals(1, pingMapper.ping());
       assertEquals("HydratingCacheManager", cacheManager.getClass().getSimpleName());
       assertTrue(context.containsBean("sqlSessionFactory"));
@@ -44,7 +48,7 @@ class SmartDomainStarterConsumerTest {
   @MapperScan(basePackageClasses = PingMapper.class)
   @EnableSmartDomainMybatis(
       associationBasePackages = "sample.consumer.starter",
-      leafEntityTypes = {Shelf.class})
+      leafEntityTypes = {Transaction.class})
   static class StarterConsumerConfiguration {
 
     @Bean
@@ -71,15 +75,15 @@ class SmartDomainStarterConsumerTest {
     int ping();
   }
 
-  static final class Library implements Entity<String, LibraryDescription> {
+  static final class Account implements Entity<String, AccountDescription> {
     private final String identity;
-    private final LibraryDescription description;
-    private final Shelves shelves;
+    private final AccountDescription description;
+    private final Transactions transactions;
 
-    Library(String identity, LibraryDescription description, Shelves shelves) {
+    Account(String identity, AccountDescription description, Transactions transactions) {
       this.identity = identity;
       this.description = description;
-      this.shelves = shelves;
+      this.transactions = transactions;
     }
 
     @Override
@@ -88,22 +92,22 @@ class SmartDomainStarterConsumerTest {
     }
 
     @Override
-    public LibraryDescription getDescription() {
+    public AccountDescription getDescription() {
       return description;
     }
 
-    public HasMany<String, Shelf> shelves() {
-      return shelves;
+    public HasMany<String, Transaction> transactions() {
+      return transactions;
     }
 
-    interface Shelves extends HasMany<String, Shelf> {}
+    interface Transactions extends HasMany<String, Transaction> {}
   }
 
-  static final class Shelf implements Entity<String, ShelfDescription> {
+  static final class Transaction implements Entity<String, TransactionDescription> {
     private final String identity;
-    private final ShelfDescription description;
+    private final TransactionDescription description;
 
-    Shelf(String identity, ShelfDescription description) {
+    Transaction(String identity, TransactionDescription description) {
       this.identity = identity;
       this.description = description;
     }
@@ -114,18 +118,19 @@ class SmartDomainStarterConsumerTest {
     }
 
     @Override
-    public ShelfDescription getDescription() {
+    public TransactionDescription getDescription() {
       return description;
     }
   }
 
-  record LibraryDescription(String name) {}
+  record AccountDescription(String current) {}
 
-  record ShelfDescription(String name) {}
+  record TransactionDescription(String amount) {}
 
-  @AssociationMapping(entity = Library.class, field = "shelves", parentIdField = "libraryId")
-  static final class LibraryShelves extends EntityList<String, Shelf> implements Library.Shelves {
-    private int libraryId;
+  @AssociationMapping(entity = Account.class, field = "transactions", parentIdField = "accountId")
+  static final class AccountTransactions extends EntityList<String, Transaction>
+      implements Account.Transactions {
+    private String accountId;
 
     @Override
     public int size() {
@@ -133,12 +138,12 @@ class SmartDomainStarterConsumerTest {
     }
 
     @Override
-    protected java.util.List<Shelf> findEntities(int from, int to) {
+    protected java.util.List<Transaction> findEntities(int from, int to) {
       return java.util.List.of();
     }
 
     @Override
-    protected Shelf findEntity(String id) {
+    protected Transaction findEntity(String id) {
       return null;
     }
   }

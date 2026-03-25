@@ -29,21 +29,22 @@ class ApiConsumerSampleTest {
 
     ResponseEntity<String> response =
         restTemplate.exchange(
-            "http://localhost:" + port + "/api/books",
+            "http://localhost:" + port + "/api/sales-settlements",
             HttpMethod.GET,
             new HttpEntity<>(headers),
             String.class);
 
     assertThat(response.getStatusCodeValue()).describedAs(response.getBody()).isEqualTo(200);
     assertThat(response.getHeaders().getContentType().toString())
-        .startsWith(BookMediaTypes.BOOK_COLLECTION);
+        .startsWith(AccountingMediaTypes.SALES_SETTLEMENT_COLLECTION);
 
     JsonNode body = objectMapper.readTree(response.getBody());
     JsonNode template = body.at("/_templates/default/properties");
 
     assertThat(template.isArray()).isTrue();
-    assertThat(findProperty(template, "genre").path("options").path("inline").isArray()).isTrue();
-    assertThat(findProperty(template, "metadata").path("_schema").path("type").asText())
+    assertThat(findProperty(template, "accountId").path("options").path("inline").isArray())
+        .isTrue();
+    assertThat(findProperty(template, "breakdown").path("_schema").path("type").asText())
         .isEqualTo("object");
   }
 

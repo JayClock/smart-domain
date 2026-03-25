@@ -6,4 +6,4 @@ spring:
 smart-domain:
   api:
     schema-scan-packages:
-      - reengineering.ddd.demo.ecommerce.api
+      - reengineering.ddd.demo.accounting.api

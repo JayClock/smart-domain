@@ -75,6 +75,26 @@ Most users should start with only these artifacts:
 
 This is the supported product surface we intend external users to adopt first.
 
+## Learning Path
+
+If you are new to Smart Domain, do not start from the low-level module list.
+
+Start here instead:
+
+1. [Getting Started](./getting-started.md)
+2. [Accounting Demo](./demo/README.md)
+3. [MyBatis Starter README](./mybatis-spring-boot-starter/README.md)
+4. [API Quick Start](./api-quick-start.md)
+5. [API Consumer Sample](./samples/api-consumer/README.md)
+
+Recommended mental order:
+
+1. download and import packages
+2. UML ownership and association boundaries
+3. model layer with association objects and context roles
+4. persistence adapter implementation
+5. RESTful API projection
+
 ## Advanced Modules
 
 The remaining artifacts are still published, but they are low-level composition modules rather than
@@ -121,6 +141,7 @@ Advanced module API:
 
 ## Docs
 
+- [Getting Started](./getting-started.md)
 - [Release Readiness](./docs/release-readiness.md)
 - [Releasing](./RELEASING.md)
 - [Repository Split Readiness](./docs/repository-split-readiness.md)
