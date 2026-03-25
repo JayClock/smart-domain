@@ -36,7 +36,7 @@ cd smart-domain
 Coordinates:
 
 - Group: `io.github.jayclock.smartdomain`
-- Version: `0.1.0-SNAPSHOT`
+- Version: `0.2.0`
 
 ## What Problem It Solves
 

@@ -8,7 +8,7 @@ This is one of the primary public entrypoints for Smart Domain persistence adopt
 ## Coordinates
 
 ```groovy
-implementation platform('io.github.jayclock.smartdomain:smart-domain-bom:0.1.0-SNAPSHOT')
+implementation platform('io.github.jayclock.smartdomain:smart-domain-bom:0.2.0')
 implementation 'io.github.jayclock.smartdomain:smart-domain-core'
 implementation 'io.github.jayclock.smartdomain:smart-domain-mybatis'
 implementation 'io.github.jayclock.smartdomain:smart-domain-mybatis-spring-boot-starter'

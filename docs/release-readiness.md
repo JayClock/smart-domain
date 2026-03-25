@@ -1,17 +1,18 @@
-# Smart Domain 0.1.0 Release Readiness
+# Smart Domain 0.2.0 Release Readiness
 
 ## Current Snapshot State
 
 As of 2026-03-24, the repository has produced and validated a local snapshot release for:
 
-- `io.github.jayclock.smartdomain:smart-domain-core:0.1.0-SNAPSHOT`
-- `io.github.jayclock.smartdomain:smart-domain-api-hateoas:0.1.0-SNAPSHOT`
-- `io.github.jayclock.smartdomain:smart-domain-api-jersey:0.1.0-SNAPSHOT`
-- `io.github.jayclock.smartdomain:smart-domain-api-spring-boot-starter:0.1.0-SNAPSHOT`
-- `io.github.jayclock.smartdomain:smart-domain-persistence:0.1.0-SNAPSHOT`
-- `io.github.jayclock.smartdomain:smart-domain-mybatis:0.1.0-SNAPSHOT`
-- `io.github.jayclock.smartdomain:smart-domain-mybatis-spring-boot-starter:0.1.0-SNAPSHOT`
-- `io.github.jayclock.smartdomain:smart-domain-bom:0.1.0-SNAPSHOT`
+- `io.github.jayclock.smartdomain:smart-domain-core:0.2.0`
+- `io.github.jayclock.smartdomain:smart-domain-api-hateoas:0.2.0`
+- `io.github.jayclock.smartdomain:smart-domain-api-jersey:0.2.0`
+- `io.github.jayclock.smartdomain:smart-domain-api-spring-boot-starter:0.2.0`
+- `io.github.jayclock.smartdomain:smart-domain-api-model-tree-tool:0.2.0`
+- `io.github.jayclock.smartdomain:smart-domain-persistence:0.2.0`
+- `io.github.jayclock.smartdomain:smart-domain-mybatis:0.2.0`
+- `io.github.jayclock.smartdomain:smart-domain-mybatis-spring-boot-starter:0.2.0`
+- `io.github.jayclock.smartdomain:smart-domain-bom:0.2.0`
 
 ## Public Product Surface
 
