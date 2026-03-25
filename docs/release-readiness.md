@@ -1,27 +1,27 @@
-# Smart Domain 0.2.0 Release Readiness
+# Smart Domain 0.2.1 Release Readiness
 
 ## Current Snapshot State
 
 As of 2026-03-24, the repository has produced and validated a local snapshot release for:
 
-- `io.github.jayclock.smartdomain:smart-domain-core:0.2.0`
-- `io.github.jayclock.smartdomain:smart-domain-api-hateoas:0.2.0`
-- `io.github.jayclock.smartdomain:smart-domain-api-jersey:0.2.0`
-- `io.github.jayclock.smartdomain:smart-domain-api-spring-boot-starter:0.2.0`
-- `io.github.jayclock.smartdomain:smart-domain-api-model-tree-tool:0.2.0`
-- `io.github.jayclock.smartdomain:smart-domain-persistence:0.2.0`
-- `io.github.jayclock.smartdomain:smart-domain-mybatis:0.2.0`
-- `io.github.jayclock.smartdomain:smart-domain-mybatis-spring-boot-starter:0.2.0`
-- `io.github.jayclock.smartdomain:smart-domain-bom:0.2.0`
+- `io.github.jayclock:smart-domain-core:0.2.1`
+- `io.github.jayclock:smart-domain-api-hateoas:0.2.1`
+- `io.github.jayclock:smart-domain-api-jersey:0.2.1`
+- `io.github.jayclock:smart-domain-api-spring-boot-starter:0.2.1`
+- `io.github.jayclock:smart-domain-api-model-tree-tool:0.2.1`
+- `io.github.jayclock:smart-domain-persistence:0.2.1`
+- `io.github.jayclock:smart-domain-mybatis:0.2.1`
+- `io.github.jayclock:smart-domain-mybatis-spring-boot-starter:0.2.1`
+- `io.github.jayclock:smart-domain-bom:0.2.1`
 
 ## Public Product Surface
 
 The recommended public entrypoints for `0.1.x` are:
 
-- `io.github.jayclock.smartdomain:smart-domain-bom`
-- `io.github.jayclock.smartdomain:smart-domain-core`
-- `io.github.jayclock.smartdomain:smart-domain-api-spring-boot-starter`
-- `io.github.jayclock.smartdomain:smart-domain-mybatis-spring-boot-starter`
+- `io.github.jayclock:smart-domain-bom`
+- `io.github.jayclock:smart-domain-core`
+- `io.github.jayclock:smart-domain-api-spring-boot-starter`
+- `io.github.jayclock:smart-domain-mybatis-spring-boot-starter`
 
 The following modules remain published for advanced composition, but are not the primary adoption
 path:

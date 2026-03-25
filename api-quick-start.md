@@ -9,8 +9,8 @@ Use the BOM and starter:
 
 ```gradle
 dependencies {
-    implementation platform("io.github.jayclock.smartdomain:smart-domain-bom:${smartDomainVersion}")
-    implementation 'io.github.jayclock.smartdomain:smart-domain-api-spring-boot-starter'
+    implementation platform("io.github.jayclock:smart-domain-bom:${smartDomainVersion}")
+    implementation 'io.github.jayclock:smart-domain-api-spring-boot-starter'
 }
 ```
 

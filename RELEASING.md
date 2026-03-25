@@ -36,12 +36,12 @@ export GPG_PRIVATE_KEY="$(cat private.asc)"
 export GPG_PASSPHRASE=...
 
 cd smart-domain
-./gradlew --no-parallel -PsmartDomainVersion=0.2.0 publishReleaseBundle
+./gradlew --no-parallel -PsmartDomainVersion=0.2.1 publishReleaseBundle
 ```
 
 ## GitHub Release Flow
 
-The standalone repository workflow publishes when a tag like `v0.2.0` is pushed or when the
+The standalone repository workflow publishes when a tag like `v0.2.1` is pushed or when the
 release workflow is run manually.
 
 It performs:

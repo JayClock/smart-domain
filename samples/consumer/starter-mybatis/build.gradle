@@ -1,8 +1,8 @@
 dependencies {
-    implementation platform("io.github.jayclock.smartdomain:smart-domain-bom:${smartDomainVersion}")
-    implementation 'io.github.jayclock.smartdomain:smart-domain-core'
-    implementation 'io.github.jayclock.smartdomain:smart-domain-mybatis'
-    implementation 'io.github.jayclock.smartdomain:smart-domain-mybatis-spring-boot-starter'
+    implementation platform("io.github.jayclock:smart-domain-bom:${smartDomainVersion}")
+    implementation 'io.github.jayclock:smart-domain-core'
+    implementation 'io.github.jayclock:smart-domain-mybatis'
+    implementation 'io.github.jayclock:smart-domain-mybatis-spring-boot-starter'
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4'
     implementation 'org.springframework.boot:spring-boot-starter:3.5.9'
 

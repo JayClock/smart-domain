@@ -264,6 +264,7 @@ if (project == rootProject) {
                 api "${group}:smart-domain-api-hateoas:${version}"
                 api "${group}:smart-domain-api-jersey:${version}"
                 api "${group}:smart-domain-api-spring-boot-starter:${version}"
+                api "${group}:smart-domain-api-model-tree-tool:${version}"
                 api "${group}:smart-domain-persistence:${version}"
                 api "${group}:smart-domain-mybatis:${version}"
                 api "${group}:smart-domain-mybatis-spring-boot-starter:${version}"
@@ -300,6 +301,7 @@ if (project == rootProject) {
         ':api-hateoas:publishToSonatype',
         ':api-jersey:publishToSonatype',
         ':api-spring-boot-starter:publishToSonatype',
+        ':api-model-tree-tool:publishToSonatype',
         ':persistence:publishToSonatype',
         ':mybatis:publishToSonatype',
         ':mybatis-spring-boot-starter:publishToSonatype',
@@ -310,6 +312,7 @@ if (project == rootProject) {
         ':api-hateoas:publishMavenJavaPublicationToBundleRepository',
         ':api-jersey:publishMavenJavaPublicationToBundleRepository',
         ':api-spring-boot-starter:publishMavenJavaPublicationToBundleRepository',
+        ':api-model-tree-tool:publishMavenJavaPublicationToBundleRepository',
         ':persistence:publishMavenJavaPublicationToBundleRepository',
         ':mybatis:publishMavenJavaPublicationToBundleRepository',
         ':mybatis-spring-boot-starter:publishMavenJavaPublicationToBundleRepository',

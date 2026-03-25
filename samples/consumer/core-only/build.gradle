@@ -1,5 +1,5 @@
 dependencies {
-    implementation "io.github.jayclock.smartdomain:smart-domain-core:${smartDomainVersion}"
+    implementation "io.github.jayclock:smart-domain-core:${smartDomainVersion}"
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.11.4'

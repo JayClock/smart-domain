@@ -6,7 +6,7 @@ changing its public coordinates.
 ## Already Independent
 
 - Product root build works from `smart-domain/`
-- Product modules publish with `io.github.jayclock.smartdomain` coordinates
+- Product modules publish with `io.github.jayclock` coordinates
 - API starter, Jersey integration, and external samples live under `smart-domain/`
 - Publishing metadata is driven by `smartDomain*` Gradle properties
 

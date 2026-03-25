@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'sample.smartdomain.api'
-version = '0.2.0'
+version = '0.2.1'
 
 repositories {
     mavenLocal()
@@ -18,8 +18,8 @@ java {
 }
 
 dependencies {
-    implementation platform("io.github.jayclock.smartdomain:smart-domain-bom:${smartDomainVersion}")
-    implementation 'io.github.jayclock.smartdomain:smart-domain-api-spring-boot-starter'
+    implementation platform("io.github.jayclock:smart-domain-bom:${smartDomainVersion}")
+    implementation 'io.github.jayclock:smart-domain-api-spring-boot-starter'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test:3.5.9'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.12.2'
