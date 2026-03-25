@@ -44,19 +44,14 @@ class ApiModelTreeToolTest {
   }
 
   @Test
-  void should_build_recursive_navigation_tree_from_halforms_conversation_fixture() throws Exception {
+  void should_build_recursive_navigation_tree_from_halforms_conversation_fixture()
+      throws Exception {
     ApiModelNode root = tool.analyze(fixture("ConversationModel.java"));
 
     assertEquals("/projects/1/conversations/2", root.api());
-    assertEquals(
-        "/projects/1/conversations/2/messages/stream",
-        findLink(root, "chat").api());
-    assertEquals(
-        "/projects/1/conversations/2",
-        findLink(root, "delete-conversation").api());
-    assertEquals(
-        "/projects/1/conversations/2/messages",
-        findLink(root, "messages").api());
+    assertEquals("/projects/1/conversations/2/messages/stream", findLink(root, "chat").api());
+    assertEquals("/projects/1/conversations/2", findLink(root, "delete-conversation").api());
+    assertEquals("/projects/1/conversations/2/messages", findLink(root, "messages").api());
     assertEquals(
         "/projects/1/conversations/2/messages",
         findLink(findLink(root, "messages"), "create-message").api());
@@ -73,8 +68,7 @@ class ApiModelTreeToolTest {
     assertEquals("/projects/1/diagrams/3/nodes", findLink(root, "nodes").api());
     assertEquals("/projects/1/diagrams/3/nodes", findLink(root, "create-node").api());
     assertEquals(
-        "/projects/1/diagrams/3/nodes/5",
-        findLink(findLink(root, "nodes"), "delete-node").api());
+        "/projects/1/diagrams/3/nodes/5", findLink(findLink(root, "nodes"), "delete-node").api());
     assertEquals(
         "/projects/1/logical-entities/7",
         findLink(findLink(root, "nodes"), "logical-entity").api());
@@ -91,9 +85,7 @@ class ApiModelTreeToolTest {
     assertEquals("/class-users/1", root.api());
     assertEquals("/class-users/1", findLink(root, "update-user").api());
     assertEquals("/class-users/1/projects", findLink(root, "projects").api());
-    assertEquals(
-        "/class-projects/7",
-        findLink(findLink(root, "projects"), "delete-project").api());
+    assertEquals("/class-projects/7", findLink(findLink(root, "projects"), "delete-project").api());
     assertEquals(
         "/class-projects/7/conversations",
         findLink(findLink(root, "projects"), "conversations").api());
@@ -138,10 +130,10 @@ class ApiModelTreeToolTest {
 
   @Test
   void should_optionally_mark_cycle_nodes() throws Exception {
-    ApiModelNode root =
-        tool.analyze(fixture("UserModel.java"), new ApiModelTreeOptions(true));
+    ApiModelNode root = tool.analyze(fixture("UserModel.java"), new ApiModelTreeOptions(true));
 
-    ApiModelNode project = findLink(findLink(findLink(root, "default-project"), "agents"), "project");
+    ApiModelNode project =
+        findLink(findLink(findLink(root, "default-project"), "agents"), "project");
     assertEquals("/projects/1", project.api());
     assertEquals(Boolean.TRUE, project.cycle());
     assertTrue(project.links().isEmpty());
@@ -304,15 +296,15 @@ class ApiModelTreeToolTest {
   }
 
   private Path fixture(String name) throws URISyntaxException {
-    return Path.of(
-            ApiModelTreeToolTest.class.getResource("/fixtures/" + name).toURI())
+    return Path.of(ApiModelTreeToolTest.class.getResource("/fixtures/" + name).toURI())
         .toAbsolutePath()
         .normalize();
   }
 
   private Path realModel(String name) {
     return Path.of(
-            "../../libs/backend/api/src/main/java/reengineering/ddd/teamai/api/representation/" + name)
+            "../../libs/backend/api/src/main/java/reengineering/ddd/teamai/api/representation/"
+                + name)
         .toAbsolutePath()
         .normalize();
   }

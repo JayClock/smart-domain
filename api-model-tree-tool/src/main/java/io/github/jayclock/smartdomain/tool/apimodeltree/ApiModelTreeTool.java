@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -19,7 +20,6 @@ import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.ast.expr.SingleMemberAnnotationExpr;
 import com.github.javaparser.ast.expr.StringLiteralExpr;
-import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.nodeTypes.NodeWithAnnotations;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
@@ -103,7 +103,8 @@ class ApiModelTreeTool {
             ? ClassLoader.getSystemResource(classResourceName)
             : topLevelClass.getClassLoader().getResource(classResourceName);
     if (resource == null) {
-      throw new IllegalArgumentException("Unable to locate compiled class for " + topLevelClass.getName());
+      throw new IllegalArgumentException(
+          "Unable to locate compiled class for " + topLevelClass.getName());
     }
     if (!"file".equalsIgnoreCase(resource.getProtocol())) {
       throw new IllegalArgumentException(
@@ -140,7 +141,9 @@ class ApiModelTreeTool {
       throw new IllegalArgumentException("Unsupported compiled class location: " + classFile);
     }
     Path classesRoot =
-        Path.of(normalizedClassFile.substring(0, normalizedClassFile.length() - resourceSuffix.length()));
+        Path.of(
+            normalizedClassFile.substring(
+                0, normalizedClassFile.length() - resourceSuffix.length()));
     if (classesRoot.getFileName() == null) {
       throw new IllegalArgumentException("Unsupported compiled class location: " + classFile);
     }
@@ -358,7 +361,8 @@ class ApiModelTreeTool {
       Optional<Expression> targetExpression = extractLinkTargetExpression(expression);
       String api =
           targetExpression
-              .flatMap(target -> resolveBuilderState(sourceContext, context, target, new ArrayDeque<>()))
+              .flatMap(
+                  target -> resolveBuilderState(sourceContext, context, target, new ArrayDeque<>()))
               .map(BuilderState::path)
               .orElse(null);
 
@@ -448,7 +452,10 @@ class ApiModelTreeTool {
         Optional<Path> resolved =
             resourceParsed.sourceContext().unit().findAll(MethodDeclaration.class).stream()
                 .filter(method -> hasAnnotation(method, "GET"))
-                .map(method -> resolveReturnedTypeFile(resourceParsed.sourceContext(), method.getType(), "Model"))
+                .map(
+                    method ->
+                        resolveReturnedTypeFile(
+                            resourceParsed.sourceContext(), method.getType(), "Model"))
                 .flatMap(Optional::stream)
                 .findFirst();
         resourceModelCache.put(cacheKey, resolved);
@@ -462,7 +469,8 @@ class ApiModelTreeTool {
     private Optional<BuilderState> resolveBuilderState(
         SourceContext sourceContext, Node context, Expression expression, Deque<String> stack) {
       if (expression instanceof StringLiteralExpr literalExpr) {
-        return Optional.of(new BuilderState(normalizePath(literalExpr.getValue()), Endpoint.none()));
+        return Optional.of(
+            new BuilderState(normalizePath(literalExpr.getValue()), Endpoint.none()));
       }
 
       if (expression instanceof EnclosedExpr enclosedExpr) {
@@ -471,7 +479,8 @@ class ApiModelTreeTool {
 
       if (expression instanceof NameExpr nameExpr) {
         return resolveVariableInitializer(context, nameExpr.getNameAsString())
-            .flatMap(initializer -> resolveBuilderState(sourceContext, context, initializer, stack));
+            .flatMap(
+                initializer -> resolveBuilderState(sourceContext, context, initializer, stack));
       }
 
       if (!(expression instanceof MethodCallExpr call)) {
@@ -490,7 +499,8 @@ class ApiModelTreeTool {
       }
 
       if ("fromPath".equals(methodName) || "fromUri".equals(methodName)) {
-        return stringArgument(call, 0).map(path -> new BuilderState(normalizePath(path), Endpoint.none()));
+        return stringArgument(call, 0)
+            .map(path -> new BuilderState(normalizePath(path), Endpoint.none()));
       }
 
       if ("getBaseUriBuilder".equals(methodName) || "getRequestUri".equals(methodName)) {
@@ -548,9 +558,12 @@ class ApiModelTreeTool {
       stack.push(key);
       try {
         Optional<BuilderState> resolved =
-            method.get().findFirst(ReturnStmt.class)
+            method
+                .get()
+                .findFirst(ReturnStmt.class)
                 .flatMap(ReturnStmt::getExpression)
-                .flatMap(returnExpr -> resolveBuilderState(context, method.get(), returnExpr, stack));
+                .flatMap(
+                    returnExpr -> resolveBuilderState(context, method.get(), returnExpr, stack));
         builderStateCache.put(key, resolved);
         return resolved;
       } finally {
@@ -572,7 +585,8 @@ class ApiModelTreeTool {
       if (call.getArguments().size() >= 2
           && call.getArgument(0) instanceof ClassExpr classExpr
           && call.getArgument(1) instanceof StringLiteralExpr literalExpr) {
-        return resolveMethodPath(sourceContext, classExpr.getType().asString(), literalExpr.getValue());
+        return resolveMethodPath(
+            sourceContext, classExpr.getType().asString(), literalExpr.getValue());
       }
 
       return Optional.empty();
@@ -611,12 +625,14 @@ class ApiModelTreeTool {
         return Optional.empty();
       }
 
-      Optional<Path> modelFile = resolveReturnedTypeFile(targetClass, method.get().getType(), "Model");
+      Optional<Path> modelFile =
+          resolveReturnedTypeFile(targetClass, method.get().getType(), "Model");
       if (modelFile.isPresent()) {
         return Optional.of(new Endpoint(modelFile.orElseThrow(), null));
       }
 
-      Optional<Path> resourceFile = resolveReturnedTypeFile(targetClass, method.get().getType(), "Api");
+      Optional<Path> resourceFile =
+          resolveReturnedTypeFile(targetClass, method.get().getType(), "Api");
       if (resourceFile.isPresent()) {
         return Optional.of(new Endpoint(null, resourceFile.orElseThrow()));
       }
@@ -626,7 +642,9 @@ class ApiModelTreeTool {
 
     private Optional<String> resolveClassPath(SourceContext sourceContext, String className) {
       return resolveClassSourceContext(sourceContext, className)
-          .flatMap(context -> findClassDeclaration(context, className).flatMap(this::pathAnnotationValue));
+          .flatMap(
+              context ->
+                  findClassDeclaration(context, className).flatMap(this::pathAnnotationValue));
     }
 
     private Optional<String> resolveMethodPath(
@@ -668,13 +686,15 @@ class ApiModelTreeTool {
     private Optional<Expression> resolveVariableInitializer(Node context, String variableName) {
       Optional<MethodDeclaration> method = context.findAncestor(MethodDeclaration.class);
       if (method.isPresent()) {
-        Optional<Expression> initializer = findVariableInitializer(method.orElseThrow(), variableName);
+        Optional<Expression> initializer =
+            findVariableInitializer(method.orElseThrow(), variableName);
         if (initializer.isPresent()) {
           return initializer;
         }
       }
 
-      Optional<ClassOrInterfaceDeclaration> type = context.findAncestor(ClassOrInterfaceDeclaration.class);
+      Optional<ClassOrInterfaceDeclaration> type =
+          context.findAncestor(ClassOrInterfaceDeclaration.class);
       if (type.isPresent()) {
         return findVariableInitializer(type.orElseThrow(), variableName);
       }
@@ -762,13 +782,14 @@ class ApiModelTreeTool {
     }
 
     private Optional<String> pathAnnotationValue(NodeWithAnnotations<?> node) {
-      return node.getAnnotationByName("Path").flatMap(
-          annotation -> {
-            if (annotation instanceof SingleMemberAnnotationExpr singleMemberAnnotationExpr) {
-              return extractStringLiteral(singleMemberAnnotationExpr.getMemberValue());
-            }
-            return Optional.empty();
-          });
+      return node.getAnnotationByName("Path")
+          .flatMap(
+              annotation -> {
+                if (annotation instanceof SingleMemberAnnotationExpr singleMemberAnnotationExpr) {
+                  return extractStringLiteral(singleMemberAnnotationExpr.getMemberValue());
+                }
+                return Optional.empty();
+              });
     }
 
     private boolean hasAnnotation(NodeWithAnnotations<?> node, String annotationName) {
@@ -833,8 +854,12 @@ class ApiModelTreeTool {
         collector.add(typeName);
       }
 
-      classType.getTypeArguments()
-          .ifPresent(arguments -> arguments.forEach(argument -> collectTypeNameBySuffix(collector, argument, suffix)));
+      classType
+          .getTypeArguments()
+          .ifPresent(
+              arguments ->
+                  arguments.forEach(
+                      argument -> collectTypeNameBySuffix(collector, argument, suffix)));
     }
 
     private String key(Path file, String className) {
@@ -933,11 +958,15 @@ class ApiModelTreeTool {
           .map(ParsedModelClass::name)
           .filter(expected::equals)
           .findFirst()
-          .orElseGet(() -> modelClasses.stream().map(ParsedModelClass::name).findFirst().orElseThrow());
+          .orElseGet(
+              () -> modelClasses.stream().map(ParsedModelClass::name).findFirst().orElseThrow());
     }
 
     private ParsedModelClass modelClassByName(String name) {
-      return modelClasses.stream().filter(parsed -> parsed.name().equals(name)).findFirst().orElse(null);
+      return modelClasses.stream()
+          .filter(parsed -> parsed.name().equals(name))
+          .findFirst()
+          .orElse(null);
     }
   }
 

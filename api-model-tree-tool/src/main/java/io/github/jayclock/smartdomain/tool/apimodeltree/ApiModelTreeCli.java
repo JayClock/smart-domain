@@ -17,8 +17,7 @@ public final class ApiModelTreeCli {
 
       Class<?> modelClass = Class.forName(className);
       System.out.println(
-          SmartDomainTools.apiModelTreeAsJson(
-              modelClass, new ApiModelTreeOptions(includeCycle)));
+          SmartDomainTools.apiModelTreeAsJson(modelClass, new ApiModelTreeOptions(includeCycle)));
     } catch (Exception exception) {
       exception.printStackTrace(System.err);
       System.exit(1);
