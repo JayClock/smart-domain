@@ -9,9 +9,11 @@ import io.github.jayclock.smartdomain.tool.apimodeltree.classfixtures.ClassEntry
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.stream.StreamSupport;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 
 class ApiModelTreeToolTest {
@@ -247,7 +249,9 @@ class ApiModelTreeToolTest {
 
   @Test
   void should_extract_rest_templates_from_real_user_model() throws Exception {
-    ApiModelNode root = tool.analyze(realModel("UserModel.java"));
+    Path realUserModel = realModel("UserModel.java");
+    Assumptions.assumeTrue(Files.exists(realUserModel), "Real Team AI UserModel.java not available");
+    ApiModelNode root = tool.analyze(realUserModel);
 
     assertEquals("/users/{id}", root.api());
     assertEquals("/users/{id}", findLink(root, "update-user").api());
@@ -279,7 +283,9 @@ class ApiModelTreeToolTest {
 
   @Test
   void should_extract_rest_templates_from_real_root_model() throws Exception {
-    ApiModelNode root = tool.analyze(realModel("RootModel.java"));
+    Path realRootModel = realModel("RootModel.java");
+    Assumptions.assumeTrue(Files.exists(realRootModel), "Real Team AI RootModel.java not available");
+    ApiModelNode root = tool.analyze(realRootModel);
 
     assertEquals("/", root.api());
     assertEquals("/auth/login", findLink(root, "login").api());
