@@ -1,0 +1,23 @@
+plugins {
+    id 'application'
+}
+
+group = 'io.github.jayclock'
+
+base {
+    archivesName = 'smart-domain-api-model-tree-tool'
+}
+
+application {
+    mainClass = 'io.github.jayclock.smartdomain.tool.apimodeltree.ApiModelTreeCli'
+}
+
+dependencies {
+    api 'com.fasterxml.jackson.core:jackson-databind'
+    implementation 'com.github.javaparser:javaparser-core:3.26.2'
+
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.springframework.hateoas:spring-hateoas'
+    testImplementation 'org.springframework:spring-web'
+}

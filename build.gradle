@@ -21,6 +21,11 @@ if (project == rootProject) {
             name       : 'Smart Domain API Spring Boot Starter',
             description: 'Spring Boot auto-configuration for Smart Domain API HATEOAS support.'
         ],
+        (project.path == ':' ? ':api-model-tree-tool' : "${project.path}:api-model-tree-tool"): [
+            artifactId : 'smart-domain-api-model-tree-tool',
+            name       : 'Smart Domain API Model Tree Tool',
+            description: 'Builds a recursive JSON link tree from TypeScript Smart Domain API model files.'
+        ],
         (project.path == ':' ? ':core' : "${project.path}:core"): [
             artifactId : 'smart-domain-core',
             name       : 'Smart Domain Core',

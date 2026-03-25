@@ -57,6 +57,7 @@ The core pattern is:
 | `smart-domain-bom` | Public version-alignment entrypoint |
 | `smart-domain-core` | Public core entrypoint for entity, association, and context-role abstractions |
 | `smart-domain-api-spring-boot-starter` | Public API entrypoint for Spring Boot applications |
+| `smart-domain-api-model-tree-tool` | External utility for building recursive JSON link trees from Java API model source files |
 | `smart-domain-mybatis-spring-boot-starter` | Public persistence entrypoint for Spring Boot applications |
 | `smart-domain-api-hateoas` | Advanced low-level API support module |
 | `smart-domain-api-jersey` | Advanced low-level Jersey integration module |
