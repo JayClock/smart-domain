@@ -18,6 +18,77 @@ The demo has one business root and four context roles:
 
 This keeps one coherent business story while still showing mixed persistence styles.
 
+### Domain Map
+
+The following diagram uses the same visual language as the root README so the demo can be read as
+one connected architecture:
+
+```mermaid
+flowchart TB
+  subgraph Context["Context Switching"]
+    Operator[Operator]
+    BookkeepingContext[BookkeepingContext]
+    AuditContext[AuditContext]
+    AccountContext[AccountContext]
+    EvidenceReviewContext[EvidenceReviewContext]
+    Bookkeeper[Bookkeeper role]
+    Auditor[Auditor role]
+    Accountant[Accountant role]
+    EvidenceReviewer[EvidenceReviewer role]
+
+    Operator --> BookkeepingContext --> Bookkeeper
+    Operator --> AuditContext --> Auditor
+    Operator --> AccountContext --> Accountant
+    Operator --> EvidenceReviewContext --> EvidenceReviewer
+  end
+
+  subgraph Domain["Domain Ownership"]
+    Customer[Customer]
+    Account[Account]
+    SourceEvidence[SourceEvidence]
+    SalesSettlement[SalesSettlement]
+    Transaction[Transaction]
+    CustomerAccounts[[Customer.accounts()]]
+    CustomerSourceEvidences[[Customer.sourceEvidences()]]
+    AccountTransactions[[Account.transactions()]]
+    EvidenceTransactions[[SourceEvidence.transactions()]]
+
+    Customer -->|owns| CustomerAccounts --> Account
+    Customer -->|owns| CustomerSourceEvidences --> SourceEvidence
+    SourceEvidence -->|subtype| SalesSettlement
+    Account -->|owns| AccountTransactions --> Transaction
+    SourceEvidence -->|owns| EvidenceTransactions --> Transaction
+  end
+
+  subgraph Lifecycle["Association Lifecycle"]
+    Aggregated[aggregated lifecycle]
+    RootAssociation[root association]
+    Reference[reference lifecycle]
+  end
+
+  Bookkeeper --> CustomerSourceEvidences
+  Auditor --> CustomerAccounts
+  Accountant --> AccountTransactions
+  EvidenceReviewer --> EvidenceTransactions
+
+  CustomerSourceEvidences --> Aggregated
+  CustomerAccounts --> RootAssociation
+  EvidenceTransactions --> Aggregated
+  AccountTransactions --> Reference
+
+  classDef context fill:#E8F1FF,stroke:#2F6FEB,color:#0B1F33,stroke-width:1px;
+  classDef role fill:#EAFBF3,stroke:#1A7F37,color:#0F2E1B,stroke-width:1px;
+  classDef entity fill:#FFF8DB,stroke:#B08800,color:#3D2F00,stroke-width:1px;
+  classDef assoc fill:#FFF1E8,stroke:#BC4C00,color:#4A1F00,stroke-width:1px;
+  classDef lifecycle fill:#F4ECFF,stroke:#8250DF,color:#2E1065,stroke-width:1px;
+
+  class BookkeepingContext,AuditContext,AccountContext,EvidenceReviewContext context;
+  class Bookkeeper,Auditor,Accountant,EvidenceReviewer role;
+  class Customer,Account,SourceEvidence,SalesSettlement,Transaction entity;
+  class CustomerAccounts,CustomerSourceEvidences,AccountTransactions,EvidenceTransactions assoc;
+  class Aggregated,RootAssociation,Reference lifecycle;
+```
+
 ## Why This Demo Exists
 
 - Keep the example independent from Team AI business concepts
@@ -152,6 +223,69 @@ The accounting demo also exposes a HATEOAS-first API:
 The API layer lives under:
 
 - `src/main/java/reengineering/ddd/demo/accounting/api`
+
+### API Projection Map
+
+The API can be read as a projection of the same domain graph rather than a separate resource model:
+
+```mermaid
+flowchart TB
+  subgraph Domain["Domain Model"]
+    Operator[Operator]
+    Customer[Customer]
+    Account[Account]
+    SourceEvidence[SourceEvidence]
+    Transaction[Transaction]
+
+    Operator --> Customer
+    Customer --> Account
+    Customer --> SourceEvidence
+    Account --> Transaction
+    SourceEvidence --> Transaction
+  end
+
+  subgraph Api["REST Projection"]
+    Root["GET /api/accounting"]
+    Operators["GET /api/accounting/operators/{operatorId}"]
+    Customers["GET /api/accounting/customers/{customerId}"]
+    Accounts["GET /api/accounting/customers/{customerId}/accounts/{accountId}"]
+    Evidences["GET /api/accounting/customers/{customerId}/source-evidences/{evidenceId}"]
+    CreateSettlement["POST /api/accounting/customers/{customerId}/source-evidences/sales-settlements"]
+    AgentTree["GET /api/accounting/agent-tree"]
+  end
+
+  Operator -.projected as.-> Operators
+  Customer -.projected as.-> Customers
+  Account -.projected as.-> Accounts
+  SourceEvidence -.projected as.-> Evidences
+  Customer -.creates through.-> CreateSettlement
+  Root --> Operators
+  Root --> Customers
+  Root --> AgentTree
+  Customers --> Accounts
+  Customers --> Evidences
+
+  classDef entity fill:#FFF8DB,stroke:#B08800,color:#3D2F00,stroke-width:1px;
+  classDef api fill:#E8F1FF,stroke:#2F6FEB,color:#0B1F33,stroke-width:1px;
+  class Operator,Customer,Account,SourceEvidence,Transaction entity;
+  class Root,Operators,Customers,Accounts,Evidences,CreateSettlement,AgentTree api;
+```
+
+## How To Read The Demo Diagrams
+
+Use the diagrams in this order:
+
+1. start with the domain overview table to see each role, entry point, adapter, and lifecycle
+2. read the domain map to understand how context switching and associations fit together
+3. read the API projection map to see how the same model becomes navigable REST resources
+
+When reading them, keep these rules in mind:
+
+- yellow nodes are business entities
+- blue nodes are context or API boundary objects
+- green nodes are role objects produced by context switching
+- orange nodes are association objects owned by entities
+- purple nodes mark lifecycle style, including aggregated, root association, and reference handling
 
 ## Agent Tree Example
 
