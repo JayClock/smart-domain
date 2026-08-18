@@ -321,7 +321,11 @@ A repository-local coding skill and eval set live at:
 
 Pi users can use `/smart-domain-plan` and `/smart-domain-implement`; both delegate to the
 association-first agents under `.pi/agents`. These instructions reject service/repository
-orchestration and generate in domain -> adapter -> HATEOAS order.
+orchestration and generate in domain -> adapter -> HATEOAS order. Verify the canonical example with:
+
+```bash
+./gradlew smartDomainCheck
+```
 
 ## Product Layout
 

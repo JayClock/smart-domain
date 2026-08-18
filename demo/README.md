@@ -341,6 +341,7 @@ node demo/examples/accounting-agent-mvp.js
 
 ```bash
 cd smart-domain
+./gradlew smartDomainCheck
 ./gradlew :demo:bootRun
 ./gradlew :demo:test --tests reengineering.ddd.demo.accounting.AccountingApiTest
 ```

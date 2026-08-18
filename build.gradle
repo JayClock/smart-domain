@@ -335,6 +335,12 @@ if (project == rootProject) {
         description = 'Publish all Smart Domain modules to the local bundle repository for Central Portal API uploads.'
         dependsOn(bundlePublishTaskPaths)
     }
+
+    tasks.register('smartDomainCheck') {
+        group = 'verification'
+        description = 'Verify the canonical no-service association-object pattern.'
+        dependsOn("${rootProject.ext.smartDomainProjectPath('demo')}:smartDomainPatternCheck")
+    }
 } else {
     description = 'Smart Domain product root'
 }

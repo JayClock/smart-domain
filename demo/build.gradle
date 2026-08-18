@@ -15,3 +15,110 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
+
+// The accounting demo is executable architecture documentation. Keep its no-service shape
+// machine-checkable so generated examples cannot silently drift into service/repository
+// orchestration.
+def accountingSourceRoot = file('src/main/java/reengineering/ddd/demo/accounting')
+def accountingSourceFiles = fileTree(accountingSourceRoot) {
+    include '**/*.java'
+}
+
+tasks.register('smartDomainPatternCheck') {
+    group = 'verification'
+    description = 'Verify the canonical accounting demo follows the no-service association pattern.'
+    inputs.files(accountingSourceFiles)
+
+    doLast {
+        def sources = accountingSourceFiles.files.sort { it.path }
+        def relative = { File file -> projectDir.toPath().relativize(file.toPath()).toString() }
+        def normalizedPath = { File file -> file.path.replace(File.separatorChar, '/' as char) }
+        def reject = { String rule, Collection<File> violations ->
+            if (!violations.isEmpty()) {
+                throw new GradleException("${rule}: ${violations.collect(relative).join(', ')}")
+            }
+        }
+
+        reject(
+            'SD001 business service/facade types are forbidden in the canonical demo',
+            sources.findAll { file ->
+                ['Service.java', 'Facade.java', 'UseCase.java'].any { suffix ->
+                    file.name.endsWith(suffix)
+                }
+            }
+        )
+
+        def modelSources = sources.findAll { file -> normalizedPath(file).contains('/accounting/model/') }
+        def forbiddenModelImports = [
+            'org.springframework',
+            'jakarta.ws.rs',
+            'io.github.jayclock.smartdomain.mybatis',
+            'reengineering.ddd.demo.accounting.api',
+            'reengineering.ddd.demo.accounting.memory',
+            'reengineering.ddd.demo.accounting.mybatis'
+        ]
+        reject(
+            'SD002 domain model imports framework or adapter code',
+            modelSources.findAll { file ->
+                forbiddenModelImports.any { forbidden -> file.text.contains("import ${forbidden}") }
+            }
+        )
+
+        def apiSources = sources.findAll { file -> normalizedPath(file).contains('/accounting/api/') }
+        reject(
+            'SD003 API imports persistence implementations',
+            apiSources.findAll { file ->
+                file.text.contains('reengineering.ddd.demo.accounting.memory') ||
+                    file.text.contains('reengineering.ddd.demo.accounting.mybatis')
+            }
+        )
+
+        def adapterSources = sources.findAll { file ->
+            normalizedPath(file).contains('/accounting/memory/') ||
+                normalizedPath(file).contains('/accounting/mybatis/')
+        }
+        reject(
+            'SD004 persistence adapter imports API code',
+            adapterSources.findAll { file ->
+                file.text.contains('reengineering.ddd.demo.accounting.api')
+            }
+        )
+
+        def requireSnippets = { String fileName, List<String> snippets ->
+            File source = sources.find { file -> file.name == fileName }
+            if (source == null) {
+                throw new GradleException("SD005 canonical source is missing: ${fileName}")
+            }
+            def missing = snippets.findAll { snippet -> !source.text.contains(snippet) }
+            if (!missing.isEmpty()) {
+                throw new GradleException(
+                    "SD005 ${fileName} is missing canonical association shape: ${missing.join(', ')}"
+                )
+            }
+        }
+
+        requireSnippets('Customer.java', [
+            'private SourceEvidences sourceEvidences;',
+            'public HasMany<String, SourceEvidence<?>> sourceEvidences()',
+            'public interface SourceEvidences extends HasMany<String, SourceEvidence<?>>',
+            'public SourceEvidence<?> record(SourceEvidenceDescription description)'
+        ])
+        requireSnippets('Account.java', [
+            'private Transactions transactions;',
+            'public HasMany<String, Transaction> transactions()',
+            'public interface Transactions extends HasMany<String, Transaction>'
+        ])
+        requireSnippets('AccountingApi.java', [
+            'private final Operators operators;',
+            'private final Customers customers;',
+            'private final BookkeepingContext bookkeepingContext;',
+            'private final AuditContext auditContext;'
+        ])
+
+        println 'Smart Domain pattern check passed: accounting remains no-service and association-first.'
+    }
+}
+
+tasks.named('check').configure {
+    dependsOn tasks.named('smartDomainPatternCheck')
+}

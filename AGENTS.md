@@ -83,6 +83,7 @@ Do not start from tables, controllers, DTOs, or generic CRUD repositories.
 Use the narrowest relevant command first:
 
 ```bash
+./gradlew smartDomainCheck
 ./gradlew :core:test
 ./gradlew :demo:test
 ./gradlew :demo:spotlessCheck

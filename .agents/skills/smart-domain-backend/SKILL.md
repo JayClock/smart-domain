@@ -39,7 +39,7 @@ observable outcome. Identify ambiguous business language before choosing classes
 
 ## Phase 2: model the connected graph
 
-Always produce this table before code:
+Always produce this association matrix before code:
 
 | Root | Owner | Field | Target | Cardinality | Public narrow API | Internal operations | Lifecycle | Adapter | API rel |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -137,7 +137,8 @@ Prefer structural and behavioral assertions over exact generated text:
 - API navigation begins at a root and exposes matching rels;
 - domain imports remain framework-free.
 
-Run the narrowest test first, then formatting and broader checks. Report commands and results.
+Run `./gradlew smartDomainCheck` when working in this repository. Then run the narrowest behavior
+test, formatting, and broader checks. Report commands and results.
 
 ## Final response
 
