@@ -8,11 +8,15 @@ and extended with Smart Domain context switching.
 
 Read it in this order:
 
-1. download and import packages
-2. draw the UML ownership and context boundaries
-3. implement the model layer with association objects and context roles
-4. implement persistence adapters
-5. project the same model as a RESTful API
+1. read the normative [Pattern Contract](./docs/pattern-contract.md)
+2. download and import packages
+3. draw the root associations, UML ownership, navigation, and context boundaries
+4. implement the model layer with association objects and context roles
+5. implement persistence adapters
+6. project the same model as a RESTful API
+
+The sequence is intentionally no-service: do not insert an application service between the API and
+the connected domain model.
 
 ## 0. Download And Import Packages
 
@@ -90,7 +94,18 @@ At the API layer you will usually import:
 import io.github.jayclock.smartdomain.api.hateoas.media.VendorMediaType;
 ```
 
-## 1. Start From UML Ownership
+## 1. Start From Roots And UML Ownership
+
+Before drawing tables or resources, identify the root associations through which callers enter the
+model. In the demo those contracts are `Customers` and `Operators`. HTTP resources resolve an
+entity through a root and invoke an entity or context role directly:
+
+```text
+AccountingApi -> Customers -> Customer/Bookkeeper -> association adapters
+```
+
+There is no application service or repository-orchestration layer in that path.
+
 
 The accounting demo starts from one root business context and four role switches.
 
@@ -220,7 +235,9 @@ The key rule is:
 - entities own association fields
 - entities expose narrow read APIs
 - wide interfaces stay near the entity and define the persistence extension point
+- entity methods coordinate multi-association business behavior
 - role objects carry context-specific behavior instead of scattering permission checks into services
+- callers enter through root associations rather than a service layer
 
 ## 3. Implement Persistence Adapters
 
@@ -369,13 +386,16 @@ rel paths, emit a readable trace, and finish with a resource summary instead of 
 
 If you want the shortest path from concept to running code, use this sequence:
 
-1. `README.md`
-2. `demo/README.md`
-3. `demo/src/main/java/reengineering/ddd/demo/accounting/model/Customer.java`
-4. `demo/src/main/java/reengineering/ddd/demo/accounting/model/Bookkeeper.java`
-5. `demo/src/main/java/reengineering/ddd/demo/accounting/memory/InMemoryCustomers.java`
-6. `demo/src/main/java/reengineering/ddd/demo/accounting/mybatis/AccountTransactions.java`
-7. `demo/src/main/java/reengineering/ddd/demo/accounting/mybatis/config/AccountingDemoSmartDomainMybatisConfiguration.java`
-8. `demo/src/main/java/reengineering/ddd/demo/accounting/api/AccountingApi.java`
-9. `api-quick-start.md`
-10. `samples/api-consumer/README.md`
+1. `docs/pattern-contract.md`
+2. `README.md`
+3. `demo/README.md`
+4. `docs/association-recipes.md`
+5. `demo/src/main/java/reengineering/ddd/demo/accounting/model/Customer.java`
+6. `demo/src/main/java/reengineering/ddd/demo/accounting/model/Bookkeeper.java`
+7. `demo/src/main/java/reengineering/ddd/demo/accounting/memory/InMemoryCustomers.java`
+8. `demo/src/main/java/reengineering/ddd/demo/accounting/mybatis/AccountTransactions.java`
+9. `demo/src/main/java/reengineering/ddd/demo/accounting/mybatis/config/AccountingDemoSmartDomainMybatisConfiguration.java`
+10. `demo/src/main/java/reengineering/ddd/demo/accounting/api/AccountingApi.java`
+11. `docs/anti-patterns.md`
+12. `api-quick-start.md`
+13. `samples/api-consumer/README.md`

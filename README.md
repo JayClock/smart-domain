@@ -71,6 +71,23 @@ One concrete flow is recording a sales settlement:
 That flow stays inside domain objects instead of being split across controllers, services, and
 query utilities.
 
+## The No-Service Contract
+
+Smart Domain is intentionally a **no-service** domain architecture. Business behavior starts from a
+root association, an entity, or a context role and continues through entity-owned association
+objects:
+
+```text
+HTTP resource -> root association -> entity/context role -> association -> adapter
+```
+
+Composition roots may wire implementations, HTTP resources may translate protocol concerns, and
+infrastructure may provide transaction boundaries. None of those objects owns domain decisions or
+coordinates anemic entities through repositories. See the normative
+[Pattern Contract](./docs/pattern-contract.md), the copyable
+[Association Recipes](./docs/association-recipes.md), and the
+[Anti-Patterns](./docs/anti-patterns.md).
+
 ## The Core Pattern
 
 The central modeling rule is simple:
@@ -84,7 +101,7 @@ The central modeling rule is simple:
 In practice it looks like this:
 
 ```java
-public class Account extends Entity<String> {
+public class Account implements Entity<String, AccountDescription> {
 
   private Transactions transactions;
 
@@ -399,19 +416,22 @@ If you are new to Smart Domain, do not start from the low-level module list.
 
 Start here instead:
 
-1. [Getting Started](./getting-started.md)
-2. [Accounting Demo](./demo/README.md)
-3. [MyBatis Starter README](./mybatis-spring-boot-starter/README.md)
-4. [API Quick Start](./api-quick-start.md)
-5. [API Consumer Sample](./samples/api-consumer/README.md)
+1. [Pattern Contract](./docs/pattern-contract.md)
+2. [Getting Started](./getting-started.md)
+3. [Accounting Demo](./demo/README.md)
+4. [Association Recipes](./docs/association-recipes.md)
+5. [MyBatis Starter README](./mybatis-spring-boot-starter/README.md)
+6. [API Quick Start](./api-quick-start.md)
+7. [API Consumer Sample](./samples/api-consumer/README.md)
 
 Recommended mental order:
 
-1. understand the accounting case
-2. draw ownership and context boundaries
-3. model associations and role objects
-4. implement persistence adapters
-5. expose the same model as a RESTful API
+1. understand the no-service contract and accounting case
+2. draw the root associations, ownership, navigation, and context boundaries
+3. model narrow/wide associations and role objects
+4. put business behavior on entities or context roles
+5. implement persistence adapters behind the same association contracts
+6. expose the same graph as a RESTful API
 
 ## Stable Vs Internal API
 
@@ -459,6 +479,9 @@ Use them only when you intentionally need lower-level control, such as:
 
 ## Docs
 
+- [Pattern Contract](./docs/pattern-contract.md)
+- [Association Recipes](./docs/association-recipes.md)
+- [Anti-Patterns](./docs/anti-patterns.md)
 - [Getting Started](./getting-started.md)
 - [Accounting Demo](./demo/README.md)
 - [API Quick Start](./api-quick-start.md)
