@@ -95,7 +95,25 @@ flowchart TB
 - Show how `HasMany` becomes a first-class domain object
 - Show how `ContextSwitcher` produces role objects
 - Show how one accounting model can mix aggregated and reference lifecycle associations
+- Demonstrate a no-service call path from HTTP resource to root, role, entity, and association
 - Provide one copyable accounting template for future projects
+
+## No-Service Call Path
+
+The runnable API does not use an application facade or repository-orchestration service:
+
+```text
+AccountingApi
+  -> Operators / Customers root associations
+  -> BookkeepingContext / AuditContext
+  -> Bookkeeper / Auditor
+  -> Customer / Account behavior
+  -> entity-owned association adapters
+```
+
+`AccountingDemoFixture` only seeds deterministic example data and publishes those fixture
+identities to the demo resource. It is bootstrap code, not part of the domain call path and not a
+template for a service layer.
 
 ## Structure
 
@@ -130,6 +148,8 @@ demo/
     │   ├── AccountingLedgerMapper
     │   ├── AccountTransactions
     │   └── config/AccountingDemoSmartDomainMybatisConfiguration
+    ├── bootstrap/
+    │   └── AccountingDemoFixture
     └── api/
         ├── AccountingApi
         ├── AccountingRootModel
@@ -223,6 +243,9 @@ The accounting demo also exposes a HATEOAS-first API:
 The API layer lives under:
 
 - `src/main/java/reengineering/ddd/demo/accounting/api`
+
+`AccountingApi` resolves the demo operator and customer through the `Operators` and `Customers`
+root associations, switches to the required context role, and invokes domain behavior directly.
 
 ### API Projection Map
 
