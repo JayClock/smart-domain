@@ -375,11 +375,33 @@ if (project == rootProject) {
         }
     }
 
+    tasks.register('smartDomainStyleInstallerTest', Exec) {
+        group = 'verification'
+        description = 'Test portable Smart Domain style installation and safe updates.'
+        inputs.files(
+            file('tools/install-smart-domain-style.py'),
+            fileTree('tools/tests') { include '**/*.py' },
+            fileTree('templates/consumer'),
+            fileTree('.agents/skills/smart-domain-backend')
+        )
+        commandLine(
+            providers.gradleProperty('pythonExecutable').getOrElse('python3'),
+            '-m',
+            'unittest',
+            'discover',
+            '-s',
+            'tools/tests',
+            '-p',
+            'test_*.py'
+        )
+    }
+
     tasks.register('smartDomainCheck') {
         group = 'verification'
         description = 'Verify the canonical no-service association-object pattern.'
         dependsOn("${rootProject.ext.smartDomainProjectPath('demo')}:smartDomainPatternCheck")
         dependsOn('smartDomainSkillReferenceCheck')
+        dependsOn('smartDomainStyleInstallerTest')
     }
 } else {
     description = 'Smart Domain product root'

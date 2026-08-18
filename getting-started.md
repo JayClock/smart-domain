@@ -18,6 +18,13 @@ Read it in this order:
 The sequence is intentionally no-service: do not insert an application service between the API and
 the connected domain model.
 
+To install the same Pattern Contract and portable coding skill into another repository, follow
+[Consumer Adoption](./docs/consumer-adoption.md) or run:
+
+```bash
+python3 tools/install-smart-domain-style.py /path/to/consumer-repository
+```
+
 ## 0. Download And Import Packages
 
 Most users should start with the public entrypoints:

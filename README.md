@@ -319,9 +319,16 @@ A portable coding skill, bundled pattern references, and eval set live at:
 .agents/skills/smart-domain-backend/
 ```
 
-Copy that complete directory into another repository's `.agents/skills/` directory; no sibling
-Smart Domain checkout is required. Keep the bundled references aligned with the normative docs by
-running `./gradlew syncSmartDomainSkillReferences` before publishing an updated skill.
+Install it into another repository with:
+
+```bash
+python3 tools/install-smart-domain-style.py /path/to/consumer-repository
+```
+
+The installer safely manages the portable skill, a version manifest, and a marked Smart Domain block
+inside the consumer's `AGENTS.md`; no sibling checkout is required afterward. See
+[Consumer Adoption](./docs/consumer-adoption.md). Keep bundled references aligned by running
+`./gradlew syncSmartDomainSkillReferences` before publishing an updated skill.
 
 Pi users can use `/smart-domain-plan` and `/smart-domain-implement`; both delegate to the
 association-first agents under `.pi/agents`. These instructions reject service/repository
