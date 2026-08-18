@@ -34,7 +34,7 @@ You are the agent-navigation specialist for this Smart Domain repository.
 
 - Do not invent endpoint paths as the primary agent contract; derive them from links/templates and `/agent-tree`.
 - Do not bypass HATEOAS by recommending direct URL construction in agent workflows.
-- Do not change domain, Application Logic, or persistence behavior.
+- Do not change domain or persistence behavior.
 - Do not duplicate API resource behavior; focus on discoverability and navigation.
 - Do not recommend production agent-tree edits for `.pi` prompt/tooling-only requests.
 

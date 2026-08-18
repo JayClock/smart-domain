@@ -1,78 +1,60 @@
 ---
-description: Implement a Smart Domain request using scenario-first TDD and project subagents
+description: Implement a no-service Smart Domain request association-first with scenario-by-scenario TDD
 argument-hint: "<functional request>"
 ---
-Implement this Smart Domain request using this repository's scenario-first architecture test process and TDD-style execution.
+Implement this request according to `docs/pattern-contract.md`.
 
-## Current repository stack
-
-This repository is a Java 17 Gradle multi-module Smart Domain product line:
-
-- Build/test: Gradle multi-project, JUnit Platform, Spring Boot dependency management 3.5.9, Spotless/google-java-format.
-- HTTP interface: Jersey/JAX-RS resources under `/api`, Spring Boot Jersey configuration, Smart Domain API Jersey auto-configuration.
-- API projection: Spring HATEOAS `RepresentationModel`, HAL, HAL-FORMS, affordances/templates, `@VendorMediaType`, vendor media type interceptors.
-- Application Logic/domain: POJO-oriented domain model, description objects, association objects (`HasOne`, `HasMany`, `Ref`), context roles, facades/services where present.
-- Persistent: in-memory demo adapters, MyBatis adapters, `@EnableSmartDomainMybatis`, mapper/hydration boundaries, Caffeine-backed persistence cache support.
-- Agent-tree: JavaParser-based `api-model-tree-tool` that inspects Java HATEOAS API model/resource classes; `/api/accounting/agent-tree`; rel-based navigation; demo agent scripts.
-- Verification: module-scoped Gradle tests, Spring Boot tests, `TestRestTemplate`, H2 or existing in-memory fakes where persistence behavior is exercised.
-
-## Functional request
+## Request
 
 $ARGUMENTS
 
-## Required workflow
+## Planning gate
 
 1. Call `smart_domain_subagent` with `agent: "smart-domain-architect"` first.
-2. Do not edit code until the plan contains:
-   - acceptance scenarios;
-   - concrete test data;
-   - affected-layer matrix for HTTP interface, Application Logic/domain, Persistent, Agent-tree, and Tests;
-   - target functions and target scenarios for every affected layer;
-   - test double/fake strategy for every affected layer.
-3. If scenarios or test data are missing, ask for clarification or state explicit assumptions before implementation.
-4. Use affected specialist agents only:
-   - Application Logic/domain contracts: `smart-domain-domain`.
-   - Persistent storage, adapters, hydration, MyBatis, Caffeine/cache, memory implementations: `smart-domain-persistence`.
-   - HTTP resources, Spring HATEOAS representations, HAL links, HAL-FORMS templates, affordances, status codes, or media types: `smart-domain-api`.
-   - `/agent-tree`, rel navigation, Java API model tree discoverability, or demo agent scripts: `smart-domain-agent-tree`.
-   - Test design and verification: `smart-domain-test`.
-5. If all layers are involved and contracts are unclear, prefer chain mode:
-   - architect -> test preflight -> domain -> persistence -> API -> agent-tree -> test.
-6. If contracts are clear and layer work is independent, use parallel specialist calls for the affected layers.
-7. Make final edits only in the parent agent after reviewing subagent output.
+2. Do not edit production code until the result contains:
+   - acceptance scenarios and concrete data;
+   - root associations;
+   - the complete association matrix;
+   - context roles and role methods;
+   - invariant ownership;
+   - Domain/Persistent/HTTP/Agent-tree/Test impact.
+3. Reject service-first designs. Business behavior must enter through a root, entity, or context
+   role and reach storage through entity-owned association contracts.
+4. Ask for clarification or state assumptions when the graph is ambiguous.
 
-## TDD execution rule
+## Specialist flow
 
-For production behavior changes, proceed scenario by scenario:
+Use only affected agents:
 
-1. Write or update the narrowest test for the next acceptance scenario.
-2. Run the narrowest Gradle test command and confirm RED, unless the existing test already fails for the expected reason.
-3. Implement the smallest production change that makes that test pass.
-4. Re-run the narrowest command and confirm GREEN.
-5. Refactor only after GREEN; then re-run the affected tests.
-6. Do not implement future scenarios before their tests exist.
+- `smart-domain-domain` for roots, entities, descriptions, associations, roles, and behavior;
+- `smart-domain-persistence` for memory/MyBatis adapters, hydration, lifecycle, and caches;
+- `smart-domain-api` for direct Jersey/HATEOAS graph projection;
+- `smart-domain-agent-tree` for rel navigation and model-tree discovery;
+- `smart-domain-test` for scenario, contract, architecture, and prompt verification.
 
-Layer-specific testing guidance:
+Prefer chain order when contracts are unclear:
 
-- HTTP interface: test Jersey/JAX-RS resource behavior with Application Logic stubs where available; assert status, body, media type, `_links`, `_templates`, and affordances.
-- Application Logic/domain: test domain/use-case behavior with Persistent stubs where available; assert associations, context roles, descriptions, and invariants.
-- Persistent: test against H2 or existing in-memory fake; use Flyway/schema migration when present; assert mapping, hydration, lifecycle style, empty results, and cache boundaries.
-- Agent-tree: test rel navigation and discoverability through `_links`, `_templates`, Java API model tree output, and `/agent-tree`, not hardcoded URLs.
+```text
+architect -> test preflight -> domain -> persistence -> API -> agent-tree -> test
+```
 
-If the request is only about `.pi` prompts/agents/extensions/docs:
+Make final edits in the parent agent after reviewing specialist output.
 
-- Treat it as tooling/prompt work.
-- Do not change production Java code.
-- Prefer static checks for prompt metadata, agent references, stack anchors, and stale framework wording.
-- Run Gradle tests only if the prompt change makes or changes claims about runtime behavior.
+## TDD execution
+
+For each production scenario:
+
+1. write the narrowest direct domain, adapter-contract, or HTTP projection test;
+2. run it and confirm the expected RED;
+3. implement the smallest change;
+4. rerun and confirm GREEN;
+5. refactor only after GREEN;
+6. continue to the next scenario.
+
+Implement in conceptual order: domain graph and behavior, association fakes, production lifecycle
+adapters, then HTTP/HATEOAS projection. Do not start from tables or controllers.
 
 ## Final report
 
-Report:
-
-- changed files;
-- implemented scenarios;
-- test data used;
-- RED/GREEN/refactor steps for production changes, or static prompt checks for `.pi`-only changes;
-- verification commands and results;
-- skipped checks or remaining risks.
+Report changed files, implemented scenarios, association/role decisions, RED/GREEN evidence,
+verification commands/results, and remaining risks.

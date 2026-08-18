@@ -307,6 +307,22 @@ HAL-FORMS templates instead of hardcoding URLs:
 node demo/examples/accounting-agent-mvp.js
 ```
 
+## AI Backend Generation
+
+Coding agents should begin with [`AGENTS.md`](./AGENTS.md) and the normative
+[Pattern Contract](./docs/pattern-contract.md). Before generating code they must produce acceptance
+scenarios, root associations, an association matrix, context roles, and invariant ownership.
+
+A repository-local coding skill and eval set live at:
+
+```text
+.agents/skills/smart-domain-backend/
+```
+
+Pi users can use `/smart-domain-plan` and `/smart-domain-implement`; both delegate to the
+association-first agents under `.pi/agents`. These instructions reject service/repository
+orchestration and generate in domain -> adapter -> HATEOAS order.
+
 ## Product Layout
 
 ```text

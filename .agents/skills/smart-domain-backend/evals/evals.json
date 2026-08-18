@@ -1,0 +1,69 @@
+{
+  "skill_name": "smart-domain-backend",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create a Java 17 Smart Domain backend for purchasing. A PurchaseOrder has many LineItems. Recording a line recalculates the order total. Lines are stored lazily with MyBatis and exposed through Jersey/HAL. Include tests.",
+      "expected_output": "An association-first implementation where PurchaseOrders is a root, PurchaseOrder owns behavior and a narrow/wide LineItems association, MyBatis implements the wide contract, and HAL projects the graph without a service layer.",
+      "files": [],
+      "expectations": [
+        "The plan includes an association matrix before implementation.",
+        "PurchaseOrder publicly exposes HasMany while an owner-local wide interface contains mutation.",
+        "Total recalculation is owned by PurchaseOrder rather than a service or adapter.",
+        "The MyBatis adapter is named from PurchaseOrder.lineItems and uses AssociationMapping.",
+        "The API resolves through a root association and does not call a mapper or business service.",
+        "Domain and adapter-contract tests are proposed or generated."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Model workspace membership with Smart Domain. Membership has its own id, role, joinedAt and status, connects User and Workspace, and only a WorkspaceOwner may change roles. Generate the domain and persistence shape, not just an explanation.",
+      "expected_output": "Membership is modeled as an entity with navigable connections, Workspace/User associations, and a WorkspaceOwner context role; mutation remains inside role/entity behavior and adapters only persist it.",
+      "files": [],
+      "expectations": [
+        "Membership is an Entity rather than a hidden join table.",
+        "The output distinguishes Ref identity facts from HasOne/HasMany navigation.",
+        "A context role binds the actor to Workspace before role changes.",
+        "Public association readers are narrow and mutation is not exposed directly.",
+        "No MembershipService or repository orchestration layer is introduced."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Generate an append-only Story revision model in Java using association-object DDD. A Story has many immutable revisions and exactly one latest revision after creation. Revisions may eventually move from memory to PostgreSQL without changing the domain API. Add a HATEOAS endpoint for revisions.",
+      "expected_output": "Story owns an append behavior and a revisions association whose lifecycle can swap behind one contract, with invariant tests and direct root-to-story-to-revisions API navigation.",
+      "files": [],
+      "expectations": [
+        "The association matrix records cardinality, mutation, lifecycle, adapter, and rel.",
+        "Story owns append/latest invariants.",
+        "The revisions accessor is read-only while a wide interface supports append.",
+        "Memory and PostgreSQL adapters target the same owner-defined contract.",
+        "The API projects Story.revisions directly without a StoryService."
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Refactor this Java model to Smart Domain: Customer contains List<Account>, Account contains List<Transaction>, and AccountingService loads repositories and posts transactions. Preserve behavior and provide an incremental migration plan.",
+      "expected_output": "The raw collections and service orchestration are replaced by roots, owner-defined associations, entity behavior, lifecycle adapters, and direct tests while preserving an incremental path.",
+      "files": [],
+      "expectations": [
+        "The response identifies raw entity collections and repository orchestration as anti-patterns.",
+        "It defines root and association matrices before code changes.",
+        "Posting behavior moves into Customer/Account or a context role.",
+        "Adapters implement wide interfaces and callers see narrow readers.",
+        "The migration plan keeps tests green in scenario-sized steps."
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "I have a Java configuration object with timeout, endpoint URL and retry count. Should I make every field an Entity and association so it follows Smart Domain? Show the appropriate model.",
+      "expected_output": "A restrained answer that keeps identity-free configuration as a value/description and does not invent entities, associations, services, or persistence adapters.",
+      "files": [],
+      "expectations": [
+        "The response does not model primitive configuration fields as entities or associations.",
+        "It explains that association objects represent identified navigable domain connections.",
+        "It uses a value object or description unless the business supplies identity and behavior."
+      ]
+    }
+  ]
+}
