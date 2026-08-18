@@ -17,7 +17,8 @@ the source revision, runtime version, and pattern version so reviews can identif
 From the pinned Smart Domain checkout, run:
 
 ```bash
-python3 tools/install-smart-domain-style.py /path/to/consumer-repository
+python3 tools/install-smart-domain-style.py /path/to/consumer-repository \
+  --base-package com.example.product
 ```
 
 The installer creates or updates:
@@ -29,6 +30,8 @@ consumer-repository/
 │   ├── evals/evals.json
 │   └── references/
 ├── .smart-domain/
+│   ├── check.py
+│   ├── config.json
 │   ├── README.md
 │   └── manifest.json
 └── AGENTS.md                    # managed Smart Domain block only
@@ -47,8 +50,8 @@ these markers in `AGENTS.md`:
 ```
 
 Instructions outside the markers are preserved. It refuses to overwrite an existing unmanaged
-skill or `.smart-domain/README.md`; inspect the conflict and use `--force` only when replacement is
-intentional.
+skill or `.smart-domain` tool/config file; inspect the conflict and use `--force` only when
+replacement is intentional.
 
 ## 3. Import runtime modules
 
@@ -68,7 +71,28 @@ dependencies {
 A consumer using custom persistence or HTTP infrastructure can depend on `smart-domain-core` only.
 See [Getting Started](../getting-started.md) for Maven coordinates and module-level imports.
 
-## 4. Start with a graph plan
+## 4. Wire the architecture gate
+
+The installer generates package-aware configuration from `--base-package` and defaults to
+`src/main/java`. For a monorepo, repeat `--source-root` during installation or edit
+`.smart-domain/config.json` afterward.
+
+Run:
+
+```bash
+python3 .smart-domain/check.py
+```
+
+The checker reports stable `SD001`–`SD006` rules for forbidden orchestration types/packages, domain
+framework imports, layer inversion, raw collections of known Entity types, and public wide-interface
+leakage. It has no third-party Python dependencies. A genuine external-integration `*Service` port
+can be listed by fully qualified name in `allowedServiceTypes`. Use `--format json` for tools and
+`--strict-warnings` in CI once all configured roots exist.
+
+The generated `.smart-domain/README.md` includes a Gradle wiring snippet. Other build systems can
+invoke the same command from their normal verification phase.
+
+## 5. Start with a graph plan
 
 Ask the coding agent to use `smart-domain-backend` and not write production code until it returns:
 
@@ -99,7 +123,7 @@ domain graph and behavior
   -> architecture and end-to-end checks
 ```
 
-## 5. Update intentionally
+## 6. Update intentionally
 
 Review Pattern Contract changes before updating consumers. Then rerun the installer from the new
 pinned release and commit the skill, manifest, generated README, and managed `AGENTS.md` block in the

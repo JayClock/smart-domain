@@ -22,7 +22,8 @@ To install the same Pattern Contract and portable coding skill into another repo
 [Consumer Adoption](./docs/consumer-adoption.md) or run:
 
 ```bash
-python3 tools/install-smart-domain-style.py /path/to/consumer-repository
+python3 tools/install-smart-domain-style.py /path/to/consumer-repository \
+  --base-package com.example.product
 ```
 
 ## 0. Download And Import Packages

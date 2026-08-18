@@ -39,4 +39,10 @@ domain graph and behavior
 Domain code must not import Spring, MyBatis, JAX-RS, Jackson, API, or persistence types. Model
 navigable entity relations with `HasOne`/`HasMany`, identity-only facts with `Ref<ID>`, and expose
 mutable associations narrowly while adapters implement owner-defined wide interfaces.
+
+Run the consumer architecture gate before declaring backend work complete:
+
+```bash
+python3 .smart-domain/check.py
+```
 <!-- smart-domain-style:end -->

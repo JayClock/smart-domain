@@ -138,7 +138,8 @@ Prefer structural and behavioral assertions over exact generated text:
 - API navigation begins at a root and exposes matching rels;
 - domain imports remain framework-free.
 
-Run `./gradlew smartDomainCheck` when working in this repository. Then run the narrowest behavior
+In a consumer repository with the installed style kit, run `python3 .smart-domain/check.py`. In the
+Smart Domain source repository, run `./gradlew smartDomainCheck`. Then run the narrowest behavior
 test, formatting, and broader checks. Report commands and results.
 
 ## Final response

@@ -322,7 +322,8 @@ A portable coding skill, bundled pattern references, and eval set live at:
 Install it into another repository with:
 
 ```bash
-python3 tools/install-smart-domain-style.py /path/to/consumer-repository
+python3 tools/install-smart-domain-style.py /path/to/consumer-repository \
+  --base-package com.example.product
 ```
 
 The installer safely manages the portable skill, a version manifest, and a marked Smart Domain block
