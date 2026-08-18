@@ -375,9 +375,9 @@ if (project == rootProject) {
         }
     }
 
-    tasks.register('smartDomainStyleInstallerTest', Exec) {
+    tasks.register('smartDomainStyleToolTest', Exec) {
         group = 'verification'
-        description = 'Test portable Smart Domain style installation and safe updates.'
+        description = 'Test portable Smart Domain installation and consumer architecture checks.'
         inputs.files(
             file('tools/install-smart-domain-style.py'),
             fileTree('tools/tests') { include '**/*.py' },
@@ -401,7 +401,7 @@ if (project == rootProject) {
         description = 'Verify the canonical no-service association-object pattern.'
         dependsOn("${rootProject.ext.smartDomainProjectPath('demo')}:smartDomainPatternCheck")
         dependsOn('smartDomainSkillReferenceCheck')
-        dependsOn('smartDomainStyleInstallerTest')
+        dependsOn('smartDomainStyleToolTest')
     }
 } else {
     description = 'Smart Domain product root'

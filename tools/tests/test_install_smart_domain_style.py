@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -11,6 +13,7 @@ SPEC = importlib.util.spec_from_file_location("install_smart_domain_style", SCRI
 assert SPEC and SPEC.loader
 INSTALLER = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(INSTALLER)
+BASE_PACKAGE = "com.acme.shop"
 
 
 class InstallSmartDomainStyleTest(unittest.TestCase):
@@ -23,7 +26,7 @@ class InstallSmartDomainStyleTest(unittest.TestCase):
         self.temporary.cleanup()
 
     def test_installs_portable_skill_agents_contract_and_manifest(self) -> None:
-        result = INSTALLER.install(self.target)
+        result = INSTALLER.install(self.target, base_package=BASE_PACKAGE)
 
         skill = self.target / ".agents/skills/smart-domain-backend"
         self.assertTrue((skill / "SKILL.md").is_file())
@@ -43,6 +46,21 @@ class InstallSmartDomainStyleTest(unittest.TestCase):
         self.assertEqual("smart-domain-style", manifest["installedBy"])
         self.assertEqual(result["patternVersion"], manifest["patternVersion"])
         self.assertEqual(result["runtimeVersion"], manifest["runtimeVersion"])
+        self.assertEqual(BASE_PACKAGE, manifest["basePackage"])
+        self.assertTrue((self.target / ".smart-domain/check.py").is_file())
+        config = json.loads(
+            (self.target / ".smart-domain/config.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual([f"{BASE_PACKAGE}.domain"], config["domainPackages"])
+        checker = subprocess.run(
+            [sys.executable, str(self.target / ".smart-domain/check.py"), "--format", "json"],
+            cwd=self.target,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(0, checker.returncode, checker.stderr)
+        self.assertTrue(json.loads(checker.stdout))
         readme = (self.target / ".smart-domain/README.md").read_text(encoding="utf-8")
         self.assertNotIn("{{", readme)
         self.assertIn(manifest["runtimeVersion"], readme)
@@ -51,11 +69,17 @@ class InstallSmartDomainStyleTest(unittest.TestCase):
         agents_path = self.target / "AGENTS.md"
         agents_path.write_text("# Project rules\n\nKeep this.\n", encoding="utf-8")
 
-        INSTALLER.install(self.target)
+        INSTALLER.install(self.target, base_package=BASE_PACKAGE)
         agents_path.write_text(
             agents_path.read_text(encoding="utf-8") + "\n## Local rule\n\nKeep this too.\n",
             encoding="utf-8",
         )
+        config_path = self.target / ".smart-domain/config.json"
+        custom_config = config_path.read_text(encoding="utf-8").replace(
+            '"src/main/java"', '"modules/domain/src/main/java"'
+        )
+        config_path.write_text(custom_config, encoding="utf-8")
+
         INSTALLER.install(self.target)
 
         agents = agents_path.read_text(encoding="utf-8")
@@ -64,6 +88,11 @@ class InstallSmartDomainStyleTest(unittest.TestCase):
         self.assertIn("Keep this.", agents)
         self.assertIn("## Local rule", agents)
         self.assertIn("Keep this too.", agents)
+        self.assertEqual(custom_config, config_path.read_text(encoding="utf-8"))
+        updated_manifest = json.loads(
+            (self.target / ".smart-domain/manifest.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(["modules/domain/src/main/java"], updated_manifest["sourceRoots"])
 
     def test_refuses_to_overwrite_unmanaged_skill_without_force(self) -> None:
         skill = self.target / ".agents/skills/smart-domain-backend"
@@ -71,9 +100,9 @@ class InstallSmartDomainStyleTest(unittest.TestCase):
         (skill / "SKILL.md").write_text("custom\n", encoding="utf-8")
 
         with self.assertRaisesRegex(INSTALLER.InstallError, "unmanaged paths"):
-            INSTALLER.install(self.target)
+            INSTALLER.install(self.target, base_package=BASE_PACKAGE)
 
-        INSTALLER.install(self.target, force=True)
+        INSTALLER.install(self.target, base_package=BASE_PACKAGE, force=True)
         self.assertNotEqual("custom\n", (skill / "SKILL.md").read_text(encoding="utf-8"))
 
     def test_rejects_malformed_agents_markers(self) -> None:
@@ -82,6 +111,10 @@ class InstallSmartDomainStyleTest(unittest.TestCase):
         )
 
         with self.assertRaisesRegex(INSTALLER.InstallError, "malformed"):
+            INSTALLER.install(self.target, base_package=BASE_PACKAGE)
+
+    def test_requires_base_package_on_first_install(self) -> None:
+        with self.assertRaisesRegex(INSTALLER.InstallError, "base-package"):
             INSTALLER.install(self.target)
 
     def test_rejects_installing_into_source_repository(self) -> None:
