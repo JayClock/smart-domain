@@ -336,10 +336,50 @@ if (project == rootProject) {
         dependsOn(bundlePublishTaskPaths)
     }
 
+    def smartDomainSkillReferencePairs = [
+        [file('docs/pattern-contract.md'), file('.agents/skills/smart-domain-backend/references/pattern-contract.md')],
+        [file('docs/association-recipes.md'), file('.agents/skills/smart-domain-backend/references/association-recipes.md')],
+        [file('docs/anti-patterns.md'), file('.agents/skills/smart-domain-backend/references/anti-patterns.md')]
+    ]
+
+    tasks.register('syncSmartDomainSkillReferences') {
+        group = 'documentation'
+        description = 'Refresh the portable skill references from the normative pattern documents.'
+        inputs.files(smartDomainSkillReferencePairs.collect { pair -> pair[0] })
+        outputs.files(smartDomainSkillReferencePairs.collect { pair -> pair[1] })
+        doLast {
+            smartDomainSkillReferencePairs.each { source, target ->
+                target.parentFile.mkdirs()
+                target.bytes = source.bytes
+            }
+        }
+    }
+
+    tasks.register('smartDomainSkillReferenceCheck') {
+        group = 'verification'
+        description = 'Verify the portable skill contains current normative pattern documents.'
+        inputs.files(smartDomainSkillReferencePairs.flatten())
+        doLast {
+            def stale = smartDomainSkillReferencePairs.findAll { source, target ->
+                !target.exists() || !java.util.Arrays.equals(source.bytes, target.bytes)
+            }
+            if (!stale.isEmpty()) {
+                throw new GradleException(
+                    "Portable skill references are stale: ${stale.collect { it[1] }.join(', ')}. " +
+                        'Run syncSmartDomainSkillReferences.'
+                )
+            }
+            if (!file('.agents/skills/smart-domain-backend/references/accounting-reference.md').exists()) {
+                throw new GradleException('Portable skill accounting reference is missing.')
+            }
+        }
+    }
+
     tasks.register('smartDomainCheck') {
         group = 'verification'
         description = 'Verify the canonical no-service association-object pattern.'
         dependsOn("${rootProject.ext.smartDomainProjectPath('demo')}:smartDomainPatternCheck")
+        dependsOn('smartDomainSkillReferenceCheck')
     }
 } else {
     description = 'Smart Domain product root'

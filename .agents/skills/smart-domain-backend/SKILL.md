@@ -8,15 +8,16 @@ Generate a connected, no-service domain model rather than a service layer over r
 
 ## Load the contract
 
-From this skill directory, read these repository files before planning:
+Read these bundled references before planning:
 
-1. `../../../docs/pattern-contract.md`
-2. `../../../docs/association-recipes.md`
-3. `../../../docs/anti-patterns.md`
-4. `../../../demo/README.md`
+1. `references/pattern-contract.md`
+2. `references/association-recipes.md`
+3. `references/anti-patterns.md`
+4. `references/accounting-reference.md`
 
-Read the relevant accounting files named by the recipes when a concrete implementation shape is
-needed. Treat the pattern contract as normative.
+The references travel with this skill, so the whole `smart-domain-backend` directory can be copied
+to another repository. When the full Smart Domain source is also available, inspect the accounting
+files named by the recipes for executable details. Treat the pattern contract as normative.
 
 ## Preserve the canonical call path
 

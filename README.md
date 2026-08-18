@@ -313,11 +313,15 @@ Coding agents should begin with [`AGENTS.md`](./AGENTS.md) and the normative
 [Pattern Contract](./docs/pattern-contract.md). Before generating code they must produce acceptance
 scenarios, root associations, an association matrix, context roles, and invariant ownership.
 
-A repository-local coding skill and eval set live at:
+A portable coding skill, bundled pattern references, and eval set live at:
 
 ```text
 .agents/skills/smart-domain-backend/
 ```
+
+Copy that complete directory into another repository's `.agents/skills/` directory; no sibling
+Smart Domain checkout is required. Keep the bundled references aligned with the normative docs by
+running `./gradlew syncSmartDomainSkillReferences` before publishing an updated skill.
 
 Pi users can use `/smart-domain-plan` and `/smart-domain-implement`; both delegate to the
 association-first agents under `.pi/agents`. These instructions reject service/repository

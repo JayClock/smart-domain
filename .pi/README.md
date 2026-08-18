@@ -77,13 +77,14 @@ Production behavior follows scenario-by-scenario Red-Green-Refactor.
 
 Both use `$ARGUMENTS`, invoke `smart-domain-architect` first, and reject service-first designs.
 
-## Project skill
+## Portable skill
 
-Coding agents that support repository-local skills can use:
+Coding agents that support repository-local skills can use or copy the complete directory:
 
 ```text
-.agents/skills/smart-domain-backend/SKILL.md
+.agents/skills/smart-domain-backend/
 ```
 
-Its eval set checks whether generated backends preserve root navigation, narrow/wide association
-interfaces, entity/context-role behavior, lifecycle adapters, and direct HATEOAS projection.
+The directory bundles its pattern references and eval set. It checks whether generated backends
+preserve root navigation, narrow/wide association interfaces, entity/context-role behavior,
+lifecycle adapters, and direct HATEOAS projection.
