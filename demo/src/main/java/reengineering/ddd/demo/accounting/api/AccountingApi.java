@@ -1,17 +1,11 @@
 package reengineering.ddd.demo.accounting.api;
 
 import io.github.jayclock.smartdomain.api.hateoas.media.VendorMediaType;
-import io.github.jayclock.smartdomain.tool.apimodeltree.ApiModelNode;
-import io.github.jayclock.smartdomain.tool.apimodeltree.ApiModelTreeOptions;
-import io.github.jayclock.smartdomain.tool.apimodeltree.SmartDomainTools;
 import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -49,16 +43,6 @@ public class AccountingApi {
     this.customers = customers;
     this.bookkeepingContext = bookkeepingContext;
     this.auditContext = auditContext;
-  }
-
-  @GET
-  @Path("agent-tree")
-  @Produces(MediaType.APPLICATION_JSON)
-  public ApiModelNode agentTree(
-      @DefaultValue("false") @QueryParam("includeCycle") boolean includeCycle) {
-    return materialize(
-        SmartDomainTools.apiModelTree(
-            AccountingRootModel.class, new ApiModelTreeOptions(includeCycle)));
   }
 
   @GET
@@ -179,20 +163,6 @@ public class AccountingApi {
     if (!actualId.equals(requestedId)) {
       throw new WebApplicationException(Response.Status.NOT_FOUND);
     }
-  }
-
-  private ApiModelNode materialize(ApiModelNode node) {
-    String api = node.api();
-    if (api != null) {
-      api =
-          api.replace("{operatorId}", fixture.operatorId())
-              .replace("{customerId}", fixture.customerId())
-              .replace("{accountId}", fixture.cashAccountId())
-              .replace("{transactionId}", fixture.firstTransactionId())
-              .replace("{evidenceId}", fixture.firstEvidenceId());
-    }
-    return new ApiModelNode(
-        node.rel(), api, node.cycle(), node.links().stream().map(this::materialize).toList());
   }
 
   public record CreateSalesSettlementRequest(

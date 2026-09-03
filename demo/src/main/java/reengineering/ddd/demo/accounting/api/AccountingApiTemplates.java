@@ -9,10 +9,6 @@ public final class AccountingApiTemplates {
     return UriBuilder.fromPath("/api").path(AccountingApi.class);
   }
 
-  public static UriBuilder agentTree() {
-    return root().path(AccountingApi.class, "agentTree");
-  }
-
   public static UriBuilder operator(String operatorId) {
     return root().path(AccountingApi.class, "operator").resolveTemplate("operatorId", operatorId);
   }

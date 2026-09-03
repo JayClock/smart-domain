@@ -1,8 +1,8 @@
 # smart-domain-core API
 
-English | [简体中文](./README.zh-CN.md)
+[English](./README.md) | 简体中文
 
-## Stable API
+## 稳定 API
 
 - `io.github.jayclock.smartdomain.core.Entity`
 - `io.github.jayclock.smartdomain.core.HasMany`
@@ -11,9 +11,8 @@ English | [简体中文](./README.zh-CN.md)
 - `io.github.jayclock.smartdomain.core.Ref`
 - `io.github.jayclock.smartdomain.core.JsonBlob`
 
-## Internal Markers
+## 内部标记
 
 - `io.github.jayclock.smartdomain.core.InternalApi`
 
-`InternalApi` is provided so downstream modules can mark implementation details without inventing
-their own stability conventions.
+`InternalApi` 供下游模块标记实现细节，从而统一表达 API 稳定性，而不必自行定义约定。

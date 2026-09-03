@@ -1,5 +1,7 @@
 # Smart Domain API Spring Boot Starter
 
+English | [简体中文](./README.zh-CN.md)
+
 `smart-domain-api-spring-boot-starter` auto-configures:
 
 - HAL and HAL-FORMS ObjectMapper support

@@ -55,23 +55,6 @@ class AccountingApiTest {
   }
 
   @Test
-  void should_expose_agent_tree_for_accounting_navigation() throws Exception {
-    ResponseEntity<String> response =
-        restTemplate.exchange(
-            "http://localhost:" + port + "/api/accounting/agent-tree",
-            HttpMethod.GET,
-            new HttpEntity<>(new HttpHeaders()),
-            String.class);
-
-    assertThat(response.getStatusCodeValue()).isEqualTo(200);
-
-    JsonNode tree = objectMapper.readTree(response.getBody());
-    assertThat(tree.path("api").asText()).isEqualTo("/api/accounting");
-    assertThat(findLink(tree, "customer").path("api").asText())
-        .isEqualTo("/api/accounting/customers/1");
-  }
-
-  @Test
   void should_record_sales_settlement_and_update_account() throws Exception {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
@@ -124,14 +107,5 @@ class AccountingApiTest {
     assertThat(customer.path("_templates").path("default").path("target").asText())
         .isEqualTo("/api/accounting/customers/1/source-evidences/sales-settlements");
     assertThat(customer.path("_templates").path("default").path("properties")).hasSize(3);
-  }
-
-  private JsonNode findLink(JsonNode node, String rel) {
-    for (JsonNode child : node.path("links")) {
-      if (rel.equals(child.path("rel").asText())) {
-        return child;
-      }
-    }
-    throw new AssertionError("Link not found: " + rel);
   }
 }

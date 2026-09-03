@@ -1,13 +1,12 @@
-# Association Recipes
+# 关联模式示例
 
-English | [简体中文](./association-recipes.zh-CN.md)
+[English](./association-recipes.md) | 简体中文
 
-These recipes are intentionally small. Use the accounting demo for the complete behavior and
-wiring.
+这些示例刻意保持简短。完整行为和装配方式请参考会计 Demo。
 
-## Root association
+## 根关联
 
-A root association is the entry to the connected model. It is not a generic repository base class.
+根关联是连通模型的入口，而不是通用仓储基类。
 
 ```java
 public interface Customers {
@@ -17,11 +16,11 @@ public interface Customers {
 }
 ```
 
-The root exposes domain language and may be implemented by memory, database, or remote adapters.
+根关联使用领域语言，可以由内存、数据库或远程适配器实现。
 
-## Mutable `HasMany`
+## 可变 `HasMany`
 
-Keep the mutable type inside the owner and return the narrow interface publicly.
+可变类型保留在拥有者内部，公共访问器只返回窄接口。
 
 ```java
 public final class Customer implements Entity<String, CustomerDescription> {
@@ -41,11 +40,11 @@ public final class Customer implements Entity<String, CustomerDescription> {
 }
 ```
 
-Callers can navigate `sourceEvidences()` but must use `Customer.record(...)` to modify it.
+调用方可以通过 `sourceEvidences()` 导航，但修改必须经过 `Customer.record(...)`。
 
-## Required `HasOne`
+## 必需的 `HasOne`
 
-Use `HasOne` when the connection is guaranteed and the graph should navigate to the entity.
+当连接保证存在且对象图需要导航到该实体时，使用 `HasOne`。
 
 ```java
 public final class Transaction implements Entity<String, TransactionDescription> {
@@ -57,24 +56,22 @@ public final class Transaction implements Entity<String, TransactionDescription>
 }
 ```
 
-Do not let `HasOne.get()` return `null`. Use a named optional association when absence is part of the
-model.
+不要让 `HasOne.get()` 返回 `null`。如果缺失本身具有业务含义，应定义返回 `Optional<E>` 的命名关联。
 
-## Identity fact with `Ref`
+## 使用 `Ref` 表达标识事实
 
-Use `Ref` inside descriptive value when the identity itself is the fact and loading the target is
-not part of that value.
+当标识本身就是事实，而从该值加载目标对象并不属于其职责时，在描述值中使用 `Ref`。
 
 ```java
 public record SalesSettlementDescription(
     Ref<String> order, Ref<String> account, Amount total) {}
 ```
 
-Add `HasOne` or `HasMany` separately if behavior or API navigation also needs the connected entity.
+如果业务行为或 API 同时需要导航到目标实体，应另外增加 `HasOne` 或 `HasMany`。
 
-## Relation with its own meaning
+## 具有自身含义的关系
 
-When a connection has identity, role, status, dates, or behavior, model it as an entity.
+如果连接本身具有标识、角色、状态、日期或行为，应把它建模为实体。
 
 ```java
 public final class Membership implements Entity<String, MembershipDescription> {
@@ -91,12 +88,11 @@ public final class Membership implements Entity<String, MembershipDescription> {
 }
 ```
 
-The owners then associate to `Membership`; they do not hide the role and dates in a join-table-only
-adapter.
+拥有者关联到 `Membership`，不要只在数据库连接表中隐藏角色和日期。
 
-## Context role
+## 上下文角色
 
-Put actor/context-specific behavior on a role object.
+将参与者/上下文特有行为放到角色对象中。
 
 ```java
 public interface Bookkeeper extends ContextRole<Operator, Customer> {
@@ -109,12 +105,11 @@ public interface BookkeepingContext
     extends ContextSwitcher<Operator, Customer, Bookkeeper> {}
 ```
 
-The resolver controls whether the actor can assume the role. The role exposes behavior without a
-service-layer permission branch.
+解析器控制参与者能否承担角色。角色暴露适当行为，无需 Service 层权限分支。
 
-## Reference-lifecycle adapter
+## 引用生命周期适配器
 
-The adapter mirrors the owner and field and implements the wide interface.
+适配器名称对应拥有者和字段，并实现宽接口。
 
 ```java
 @AssociationMapping(entity = Account.class, field = "transactions", parentIdField = "accountId")
@@ -132,11 +127,11 @@ public final class AccountTransactions
 }
 ```
 
-It owns persistence mechanics, not account policy.
+它负责持久化机制，不负责账户业务策略。
 
-## Aggregated-lifecycle adapter
+## 聚合生命周期适配器
 
-Use an in-memory association when associated entities move with the materialized owner.
+关联实体随已物化拥有者一起存在时，可以使用内存关联。
 
 ```java
 public final class SourceEvidenceTransactions
@@ -144,11 +139,11 @@ public final class SourceEvidenceTransactions
     implements SourceEvidence.Transactions {}
 ```
 
-The public domain contract remains `SourceEvidence.Transactions` regardless of lifecycle.
+无论采用哪种生命周期，公共领域契约始终是 `SourceEvidence.Transactions`。
 
-## HATEOAS projection
+## HATEOAS 投影
 
-Start from a root and navigate the domain rather than calling a mapper or service.
+从根关联进入并导航领域模型，而不是调用 Mapper 或 Service。
 
 ```java
 @Path("customers/{customerId}/source-evidences")
@@ -168,5 +163,4 @@ public final class SourceEvidencesApi {
 }
 ```
 
-Represent connections with links and operations with affordances/templates so API navigation remains
-aligned with the object graph.
+使用链接表示连接，使用 affordance/template 表示操作，使 API 导航与对象图保持一致。

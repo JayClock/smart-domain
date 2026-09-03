@@ -1,6 +1,8 @@
 # Smart Domain Anti-Patterns
 
-Use these examples when reviewing human- or AI-generated code.
+English | [简体中文](./anti-patterns.zh-CN.md)
+
+Use these examples when reviewing Smart Domain implementations.
 
 ## Repository orchestration service
 

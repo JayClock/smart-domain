@@ -1,12 +1,12 @@
 # smart-domain-bom
 
-English | [简体中文](./README.zh-CN.md)
+[English](./README.md) | 简体中文
 
-Use the BOM to keep every Smart Domain artifact on the same version.
+使用 BOM 让所有 Smart Domain 组件保持相同版本。
 
-## Recommended Public Usage
+## 推荐用法
 
-Most users should start with the public entrypoints:
+大多数用户从以下公共入口开始：
 
 ```groovy
 implementation platform('io.github.jayclock:smart-domain-bom:0.3.0')
@@ -15,7 +15,7 @@ implementation 'io.github.jayclock:smart-domain-api-spring-boot-starter'
 implementation 'io.github.jayclock:smart-domain-mybatis-spring-boot-starter'
 ```
 
-## Gradle Advanced Composition
+## Gradle 高级组合
 
 ```groovy
 implementation platform('io.github.jayclock:smart-domain-bom:0.3.0')
@@ -43,7 +43,7 @@ implementation 'io.github.jayclock:smart-domain-mybatis-spring-boot-starter'
 </dependencyManagement>
 ```
 
-The BOM aligns:
+BOM 统一管理：
 
 - `smart-domain-core`
 - `smart-domain-api-hateoas`

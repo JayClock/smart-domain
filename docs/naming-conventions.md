@@ -1,5 +1,7 @@
 # Naming Conventions
 
+English | [简体中文](./naming-conventions.zh-CN.md)
+
 Smart Domain works best when the model field, wide interface, adapter, and starter package all use
 the same domain language.
 

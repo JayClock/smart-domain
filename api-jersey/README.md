@@ -1,5 +1,7 @@
 # smart-domain-api-jersey
 
+English | [简体中文](./README.zh-CN.md)
+
 Jersey-specific support for Smart Domain APIs.
 
 Status: advanced low-level module, not the primary public entrypoint.

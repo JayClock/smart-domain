@@ -1,11 +1,13 @@
 # smart-domain-api-hateoas
 
+English | [简体中文](./README.zh-CN.md)
+
 Reusable HATEOAS and HAL-FORMS support for Smart Domain based APIs.
 
 Status: advanced low-level module, not the primary public entrypoint.
 
-This module is intentionally framework-support oriented. It does not ship Team AI resource models or
-business endpoints. Instead it provides:
+This module is intentionally framework-support oriented. It does not ship application-specific
+resource models or business endpoints. Instead it provides:
 
 - vendor media type annotations and helpers
 - pagination for Smart Domain collections

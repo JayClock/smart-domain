@@ -3,7 +3,6 @@ plugins {
 }
 
 dependencies {
-    implementation project(rootProject.ext.smartDomainProjectPath('api-model-tree-tool'))
     implementation project(rootProject.ext.smartDomainProjectPath('api-spring-boot-starter'))
     implementation project(rootProject.ext.smartDomainProjectPath('core'))
     implementation project(rootProject.ext.smartDomainProjectPath('mybatis'))
@@ -17,8 +16,7 @@ dependencies {
 }
 
 // The accounting demo is executable architecture documentation. Keep its no-service shape
-// machine-checkable so generated examples cannot silently drift into service/repository
-// orchestration.
+// machine-checkable so the example cannot silently drift into service/repository orchestration.
 def accountingSourceRoot = file('src/main/java/reengineering/ddd/demo/accounting')
 def accountingSourceFiles = fileTree(accountingSourceRoot) {
     include '**/*.java'

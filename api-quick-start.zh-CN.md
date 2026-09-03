@@ -1,15 +1,12 @@
-# Smart Domain API Quick Start
+# Smart Domain API 快速开始
 
-English | [简体中文](./api-quick-start.zh-CN.md)
+[English](./api-quick-start.md) | 简体中文
 
-This guide shows the minimum path for exposing a Smart Domain backed REST API with Jersey, HAL and
-HAL-FORMS.
+本指南介绍使用 Jersey、HAL 和 HAL-FORMS 暴露 Smart Domain REST API 的最短路径。示例使用会计 Demo 的领域语言。
 
-The sample language here is the accounting case used by `demo/accounting`.
+## 1. 添加依赖
 
-## 1. Add Dependencies
-
-Use the BOM and starter:
+使用 BOM 和 Starter：
 
 ```gradle
 dependencies {
@@ -18,7 +15,7 @@ dependencies {
 }
 ```
 
-## 2. Configure Spring Boot
+## 2. 配置 Spring Boot
 
 ```yaml
 spring:
@@ -32,7 +29,7 @@ smart-domain:
       - com.example.accounting.api
 ```
 
-## 3. Register Jersey Resources
+## 3. 注册 Jersey 资源
 
 ```java
 @Configuration
@@ -43,7 +40,7 @@ public class AccountingJerseyConfiguration extends ResourceConfig {
 }
 ```
 
-## 4. Build A Resource
+## 4. 创建资源
 
 ```java
 @Component
@@ -59,12 +56,11 @@ public class SalesSettlementsApi {
 }
 ```
 
-`@VendorMediaType` comes from `smart-domain-api-hateoas`. The Spring Boot starter takes care of the
-Jersey interceptor and HAL object mapper configuration.
+`@VendorMediaType` 来自 `smart-domain-api-hateoas`。Spring Boot Starter 会配置 Jersey 拦截器和 HAL ObjectMapper。
 
-## 5. Extend HAL-FORMS
+## 5. 扩展 HAL-FORMS
 
-Use `HalFormsOptionsCustomizer` for inline or remote options:
+使用 `HalFormsOptionsCustomizer` 提供内联或远程选项：
 
 ```java
 @Component
@@ -79,7 +75,7 @@ public class AccountingOptionsCustomizer implements HalFormsOptionsCustomizer {
 }
 ```
 
-Use `@WithJsonSchema` on input fields that should expose JSON Schema in HAL-FORMS:
+需要在 HAL-FORMS 中暴露 JSON Schema 的输入字段可以使用 `@WithJsonSchema`：
 
 ```java
 public record CreateSalesSettlementRequest(
@@ -88,7 +84,6 @@ public record CreateSalesSettlementRequest(
     @WithJsonSchema(SettlementBreakdown.class) SettlementBreakdown breakdown) {}
 ```
 
-## 6. Run The Published Sample
+## 6. 运行已发布包的示例
 
-See [API Consumer Sample](./samples/api-consumer/README.md) for a complete working example that
-consumes published artifacts from `mavenLocal`.
+完整示例见 [API Consumer Sample](./samples/api-consumer/README.zh-CN.md)。它从 `mavenLocal` 使用已发布的 Smart Domain 组件。

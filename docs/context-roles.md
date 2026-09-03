@@ -1,5 +1,7 @@
 # Context Roles
 
+English | [简体中文](./context-roles.zh-CN.md)
+
 Smart Domain supports context-specific role switching in `smart-domain-core`.
 
 Use it when an actor enters a business context and gains a role object with behavior that only

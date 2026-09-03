@@ -1,10 +1,12 @@
 # Smart Domain Pattern Contract
 
+English | [简体中文](./pattern-contract.zh-CN.md)
+
 Status: normative  
 Pattern version: 1
 
-This document defines the architecture that Smart Domain examples, AI instructions, and generated
-backends must follow. Tutorials may elaborate on it but must not weaken it.
+This document defines the architecture that Smart Domain modules, examples, and integrations must
+follow. Tutorials may elaborate on it but must not weaken it.
 
 ## 1. No-service architecture
 
@@ -198,9 +200,9 @@ The HTTP layer may translate a request into a Description or value object, resol
 switch context roles, invoke behavior, and map domain failures. It must not call mappers or
 reimplement business decisions.
 
-## 10. Required planning artifact
+## 10. Required design artifact
 
-Before generating code, write an association matrix:
+Before implementation, write an association matrix:
 
 | Root | Owner | Field | Target | Cardinality | Public API | Internal operations | Lifecycle | Adapter | API rel |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -215,7 +217,7 @@ Also list:
 - adapter contract tests;
 - rels and affordances exposed by the API.
 
-Code generation starts only after these artifacts form one coherent graph.
+Implementation starts only after these artifacts form one coherent graph.
 
 ## 11. Completion criteria
 

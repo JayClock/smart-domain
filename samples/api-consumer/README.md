@@ -1,5 +1,7 @@
 # Smart Domain Accounting API Consumer Sample
 
+English | [简体中文](./README.zh-CN.md)
+
 This sample consumes the published Smart Domain API artifacts from `mavenLocal`.
 
 It demonstrates a minimal accounting-facing API consumer over published Smart Domain artifacts:

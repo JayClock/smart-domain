@@ -1,5 +1,7 @@
 # Getting Started
 
+English | [简体中文](./getting-started.zh-CN.md)
+
 This is the recommended Smart Domain learning path for new users.
 
 The canonical case in this repository is now the `accounting` demo, adapted from
@@ -17,14 +19,6 @@ Read it in this order:
 
 The sequence is intentionally no-service: do not insert an application service between the API and
 the connected domain model.
-
-To install the same Pattern Contract and portable coding skill into another repository, follow
-[Consumer Adoption](./docs/consumer-adoption.md) or run:
-
-```bash
-python3 tools/install-smart-domain-style.py /path/to/consumer-repository \
-  --base-package com.example.product
-```
 
 ## 0. Download And Import Packages
 
@@ -113,7 +107,6 @@ AccountingApi -> Customers -> Customer/Bookkeeper -> association adapters
 ```
 
 There is no application service or repository-orchestration layer in that path.
-
 
 The accounting demo starts from one root business context and four role switches.
 
@@ -325,7 +318,6 @@ flowchart TB
     Accounts["GET /api/accounting/customers/{customerId}/accounts/{accountId}"]
     Evidences["GET /api/accounting/customers/{customerId}/source-evidences/{evidenceId}"]
     CreateSettlement["POST /api/accounting/customers/{customerId}/source-evidences/sales-settlements"]
-    AgentTree["GET /api/accounting/agent-tree"]
   end
 
   Operator -.projected as.-> Operators
@@ -335,14 +327,13 @@ flowchart TB
   Customer -.creates through.-> CreateSettlement
   Root --> Operators
   Root --> Customers
-  Root --> AgentTree
   Customers --> Accounts
   Customers --> Evidences
 
   classDef entity fill:#FFF8DB,stroke:#B08800,color:#3D2F00,stroke-width:1px;
   classDef api fill:#E8F1FF,stroke:#2F6FEB,color:#0B1F33,stroke-width:1px;
   class Operator,Customer,Account,SourceEvidence,Transaction entity;
-  class Root,Operators,Customers,Accounts,Evidences,CreateSettlement,AgentTree api;
+  class Root,Operators,Customers,Accounts,Evidences,CreateSettlement api;
 ```
 
 ## How To Read These Diagrams
@@ -378,17 +369,6 @@ Then open the accounting endpoints:
 - `POST /api/accounting/customers/{customerId}/source-evidences/sales-settlements`
 - `GET /api/accounting/customers/{customerId}/accounts/{accountId}`
 - `GET /api/accounting/customers/{customerId}/source-evidences/{evidenceId}`
-- `GET /api/accounting/agent-tree`
-
-If you want a runnable AI-facing example that reads the JSON tree and constructs request payloads
-from HAL-FORMS templates, run:
-
-```bash
-node demo/examples/accounting-agent-mvp.js
-```
-
-That script uses AI-provided `agent-plan` step arrays to show how an agent can execute multi-step
-rel paths, emit a readable trace, and finish with a resource summary instead of hardcoded URLs.
 
 ## 6. Recommended Reading Order
 

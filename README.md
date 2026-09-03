@@ -1,5 +1,7 @@
 # Smart Domain
 
+English | [简体中文](./README.zh-CN.md)
+
 Smart Domain is a publishable Java product line for domain models built around association
 objects, context-specific roles, progressive-loading persistence, and HATEOAS-first API exposure.
 
@@ -236,7 +238,6 @@ The accounting demo exposes:
 - `POST /api/accounting/customers/{customerId}/source-evidences/sales-settlements`
 - `GET /api/accounting/customers/{customerId}/accounts/{accountId}`
 - `GET /api/accounting/customers/{customerId}/source-evidences/{evidenceId}`
-- `GET /api/accounting/agent-tree`
 
 That projection can be read as a direct mapping from domain root to resource graph:
 
@@ -263,7 +264,6 @@ flowchart TB
     Accounts["GET /api/accounting/customers/{customerId}/accounts/{accountId}"]
     Evidences["GET /api/accounting/customers/{customerId}/source-evidences/{evidenceId}"]
     CreateSettlement["POST /api/accounting/customers/{customerId}/source-evidences/sales-settlements"]
-    AgentTree["GET /api/accounting/agent-tree"]
   end
 
   Operator -.projected as.-> Operators
@@ -273,14 +273,13 @@ flowchart TB
   Customer -.creates through.-> CreateSettlement
   Root --> Operators
   Root --> Customers
-  Root --> AgentTree
   Customers --> Accounts
   Customers --> Evidences
 
   classDef entity fill:#FFF8DB,stroke:#B08800,color:#3D2F00,stroke-width:1px;
   classDef api fill:#E8F1FF,stroke:#2F6FEB,color:#0B1F33,stroke-width:1px;
   class Operator,Customer,Account,SourceEvidence,Transaction entity;
-  class Root,Operators,Customers,Accounts,Evidences,CreateSettlement,AgentTree api;
+  class Root,Operators,Customers,Accounts,Evidences,CreateSettlement api;
 ```
 
 ## How To Read The Diagrams
@@ -298,46 +297,6 @@ When reading them, keep these rules in mind:
 - green nodes are role objects produced by context switching
 - orange nodes are association objects owned by entities
 - purple nodes mark lifecycle style, especially the difference between aggregated and reference associations
-
-The same repository also includes an AI-facing example that reads the JSON link tree and follows
-HAL-FORMS templates instead of hardcoding URLs:
-
-```bash
-./gradlew :demo:bootRun
-node demo/examples/accounting-agent-mvp.js
-```
-
-## AI Backend Generation
-
-Coding agents should begin with [`AGENTS.md`](./AGENTS.md) and the normative
-[Pattern Contract](./docs/pattern-contract.md). Before generating code they must produce acceptance
-scenarios, root associations, an association matrix, context roles, and invariant ownership.
-
-A portable coding skill, bundled pattern references, and eval set live at:
-
-```text
-.agents/skills/smart-domain-backend/
-```
-
-Install it into another repository with:
-
-```bash
-python3 tools/install-smart-domain-style.py /path/to/consumer-repository \
-  --base-package com.example.product
-```
-
-The installer safely manages the portable skill, a version manifest, and a marked Smart Domain block
-inside the consumer's `AGENTS.md`; no sibling checkout is required afterward. See
-[Consumer Adoption](./docs/consumer-adoption.md). Keep bundled references aligned by running
-`./gradlew syncSmartDomainSkillReferences` before publishing an updated skill.
-
-Pi users can use `/smart-domain-plan` and `/smart-domain-implement`; both delegate to the
-association-first agents under `.pi/agents`. These instructions reject service/repository
-orchestration and generate in domain -> adapter -> HATEOAS order. Verify the canonical example with:
-
-```bash
-./gradlew smartDomainCheck
-```
 
 ## Product Layout
 
@@ -377,7 +336,6 @@ These are the primary modules intended for external adoption.
 | `smart-domain-bom` | Version-alignment entrypoint |
 | `smart-domain-core` | Core entity, association, and context-role abstractions |
 | `smart-domain-api-spring-boot-starter` | Spring Boot entrypoint for API exposure |
-| `smart-domain-api-model-tree-tool` | Utility for building recursive JSON link trees from API model source files |
 | `smart-domain-mybatis-spring-boot-starter` | Spring Boot entrypoint for persistence integration |
 | `smart-domain-api-hateoas` | Low-level HATEOAS and HAL-FORMS support |
 | `smart-domain-api-jersey` | Low-level Jersey integration |
@@ -520,7 +478,6 @@ Use them only when you intentionally need lower-level control, such as:
 - [Release Readiness](./docs/release-readiness.md)
 - [Releasing](./RELEASING.md)
 - [Repository Split Readiness](./docs/repository-split-readiness.md)
-- [Migration Guide](./docs/migration-from-team-ai.md)
 - [Naming Conventions](./docs/naming-conventions.md)
 - [Context Roles](./docs/context-roles.md)
 - [Starter README](./mybatis-spring-boot-starter/README.md)

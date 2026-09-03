@@ -1,10 +1,10 @@
-# Smart Domain 0.3.0 Release Readiness
+# Smart Domain 0.3.0 发布就绪状态
 
-English | [简体中文](./release-readiness.zh-CN.md)
+[English](./release-readiness.md) | 简体中文
 
-## Current Snapshot State
+## 当前本地发布状态
 
-As of 2026-09-03, the repository has produced and validated a local release for:
+截至 2026-09-03，仓库已经生成并验证以下本地发布组件：
 
 - `io.github.jayclock:smart-domain-core:0.3.0`
 - `io.github.jayclock:smart-domain-api-hateoas:0.3.0`
@@ -15,26 +15,25 @@ As of 2026-09-03, the repository has produced and validated a local release for:
 - `io.github.jayclock:smart-domain-mybatis-spring-boot-starter:0.3.0`
 - `io.github.jayclock:smart-domain-bom:0.3.0`
 
-## Public Product Surface
+## 公共产品入口
 
-The recommended public entrypoints for `0.3.x` are:
+`0.3.x` 推荐从以下组件开始：
 
 - `io.github.jayclock:smart-domain-bom`
 - `io.github.jayclock:smart-domain-core`
 - `io.github.jayclock:smart-domain-api-spring-boot-starter`
 - `io.github.jayclock:smart-domain-mybatis-spring-boot-starter`
 
-The following modules remain published for advanced composition, but are not the primary adoption
-path:
+以下组件继续用于高级组合，但不是首选入口：
 
 - `smart-domain-api-hateoas`
 - `smart-domain-api-jersey`
 - `smart-domain-persistence`
 - `smart-domain-mybatis`
 
-## Validated Commands
+## 已验证命令
 
-Snapshot publication from the product root:
+从产品根目录发布到 `mavenLocal`：
 
 ```bash
 cd smart-domain
@@ -49,18 +48,17 @@ cd smart-domain
   :bom:publishToMavenLocal
 ```
 
-External consumer verification:
+外部使用示例验证：
 
 ```bash
-cd smart-domain
 ./gradlew -p samples/consumer test
 ./gradlew -p samples/api-consumer test
 ```
 
-## Compatibility Notes For 0.3.x
+## 0.3.x 兼容性说明
 
-- The supported baseline is Java 17, Spring Boot 3.5.x, and MyBatis Spring Boot Starter 3.0.x.
-- Local consumer validation runs against artifacts published to `mavenLocal` before Central release.
-- Maven Central publication is automated by the repository release workflow.
-- No JPA integration, code generator, or multi-dialect abstraction is included in `0.3.x`.
-- The former API model-tree utility and its demo endpoint are not part of the 0.3.x product surface.
+- 支持基线为 Java 17、Spring Boot 3.5.x 和 MyBatis Spring Boot Starter 3.0.x；
+- 发布到 Central 前，外部示例使用 `mavenLocal` 中的组件验证；
+- Maven Central 发布由仓库发布工作流自动完成；
+- 目前不包含 JPA 集成、代码生成器或多数据库方言抽象；
+- 原 API model-tree 工具及其演示端点不属于 0.3.x 产品范围。

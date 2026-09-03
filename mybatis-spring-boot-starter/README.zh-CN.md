@@ -1,13 +1,10 @@
 # smart-domain-mybatis-spring-boot-starter
 
-English | [简体中文](./README.zh-CN.md)
+[English](./README.md) | 简体中文
 
-`smart-domain-mybatis-spring-boot-starter` is the recommended entry point for Spring Boot
-applications.
+`smart-domain-mybatis-spring-boot-starter` 是 Spring Boot 应用接入 Smart Domain 持久化的推荐入口。
 
-This is one of the primary public entrypoints for Smart Domain persistence adoption.
-
-## Coordinates
+## Maven 坐标
 
 ```groovy
 implementation platform('io.github.jayclock:smart-domain-bom:0.3.0')
@@ -17,7 +14,7 @@ implementation 'io.github.jayclock:smart-domain-mybatis-spring-boot-starter'
 implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4'
 ```
 
-## Minimal Configuration
+## 最小配置
 
 ```java
 @Configuration
@@ -34,42 +31,35 @@ class AccountingMybatisConfiguration {
 }
 ```
 
-## How To Fill `associationBasePackages`
+## 配置 `associationBasePackages`
 
-Point `associationBasePackages` at the package root that contains your association adapters
-annotated with `@AssociationMapping`.
+该值应指向包含 `@AssociationMapping` 关联适配器的包根目录。
 
-Typical values:
+常见示例：
 
 - `com.example.accounting.mybatis`
 - `com.example.accounting.persistence.mybatis`
 
-Do not point it at your entire application root unless your association classes actually live
-there.
+除非关联类确实分布在整个应用中，否则不要直接扫描应用根包。
 
-## How To Fill `leafEntityTypes`
+## 配置 `leafEntityTypes`
 
-List the entity classes that do not own association objects but still need to be recognized by the
-hydrator.
-
-Typical examples:
+列出本身不拥有其他关联对象，但仍需要被 Hydrator 识别的实体，例如：
 
 - `Transaction.class`
 - `SalesSettlement.class`
 - `Operator.class`
 
-If an entity is only ever reached through `@AssociationMapping` discovery, it does not need to be
-repeated in `leafEntityTypes`.
+如果实体始终可以通过 `@AssociationMapping` 发现，就不需要在 `leafEntityTypes` 中重复声明。
 
-## Stable API
+## 稳定 API
 
 - `io.github.jayclock.smartdomain.boot.EnableSmartDomainMybatis`
 
-## Internal API
+## 内部 API
 
 - `io.github.jayclock.smartdomain.boot.SmartDomainMybatisAutoConfiguration`
 - `io.github.jayclock.smartdomain.boot.SmartDomainMybatisConfigurer`
 - `io.github.jayclock.smartdomain.boot.SmartDomainMybatisRegistrar`
 
-Application code should depend on the annotation entry point, not on the internal bootstrapping
-types.
+应用代码应依赖注解入口，而不是内部启动类型。

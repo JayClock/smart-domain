@@ -1,5 +1,7 @@
 # Smart Domain Repository Split Readiness
 
+English | [简体中文](./repository-split-readiness.zh-CN.md)
+
 This checklist tracks the work needed to move `smart-domain/` into its own repository without
 changing its public coordinates.
 
@@ -27,5 +29,5 @@ changing its public coordinates.
 2. Create the standalone repository with the current `smart-domain/` tree as root.
 3. Port CI, release secrets, and signing configuration.
 4. Publish a new snapshot from the standalone repository.
-5. Update Team AI to consume the published artifacts instead of sibling project references where
-   appropriate.
+5. Update downstream applications to consume the published artifacts instead of sibling project
+   references where appropriate.

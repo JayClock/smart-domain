@@ -1,5 +1,7 @@
 # Smart Domain Accounting Demo
 
+English | [简体中文](./README.zh-CN.md)
+
 This module is the main runnable example of the Smart Domain pattern.
 
 It uses the accounting case from the public `Accounting` reference and extends it with Smart
@@ -91,7 +93,7 @@ flowchart TB
 
 ## Why This Demo Exists
 
-- Keep the example independent from Team AI business concepts
+- Keep the example focused on accounting business concepts
 - Show how `HasMany` becomes a first-class domain object
 - Show how `ContextSwitcher` produces role objects
 - Show how one accounting model can mix aggregated and reference lifecycle associations
@@ -222,7 +224,7 @@ Relevant files:
 
 ## Runtime Correspondence Example
 
-The starter layer adds runtime wiring without introducing Team AI business packages:
+The starter layer adds runtime wiring without introducing unrelated business packages:
 
 - Association scan root: `reengineering.ddd.demo.accounting.mybatis`
 - Leaf entity registration: `Transaction.class`
@@ -238,7 +240,6 @@ The accounting demo also exposes a HATEOAS-first API:
 - `POST /api/accounting/customers/{customerId}/source-evidences/sales-settlements`
 - `GET /api/accounting/customers/{customerId}/accounts/{accountId}`
 - `GET /api/accounting/customers/{customerId}/source-evidences/{evidenceId}`
-- `GET /api/accounting/agent-tree`
 
 The API layer lives under:
 
@@ -274,7 +275,6 @@ flowchart TB
     Accounts["GET /api/accounting/customers/{customerId}/accounts/{accountId}"]
     Evidences["GET /api/accounting/customers/{customerId}/source-evidences/{evidenceId}"]
     CreateSettlement["POST /api/accounting/customers/{customerId}/source-evidences/sales-settlements"]
-    AgentTree["GET /api/accounting/agent-tree"]
   end
 
   Operator -.projected as.-> Operators
@@ -284,14 +284,13 @@ flowchart TB
   Customer -.creates through.-> CreateSettlement
   Root --> Operators
   Root --> Customers
-  Root --> AgentTree
   Customers --> Accounts
   Customers --> Evidences
 
   classDef entity fill:#FFF8DB,stroke:#B08800,color:#3D2F00,stroke-width:1px;
   classDef api fill:#E8F1FF,stroke:#2F6FEB,color:#0B1F33,stroke-width:1px;
   class Operator,Customer,Account,SourceEvidence,Transaction entity;
-  class Root,Operators,Customers,Accounts,Evidences,CreateSettlement,AgentTree api;
+  class Root,Operators,Customers,Accounts,Evidences,CreateSettlement api;
 ```
 
 ## How To Read The Demo Diagrams
@@ -309,33 +308,6 @@ When reading them, keep these rules in mind:
 - green nodes are role objects produced by context switching
 - orange nodes are association objects owned by entities
 - purple nodes mark lifecycle style, including aggregated, root association, and reference handling
-
-## Agent Tree Example
-
-The accounting demo keeps a runnable agent example that:
-
-1. reads `/api/accounting/agent-tree`
-2. accepts AI-provided `agent-plan` step arrays
-3. resolves rel-by-rel navigation from the JSON tree
-4. follows `_links`
-5. finds HAL-FORMS templates by rel or target
-6. constructs request data from template properties
-7. posts or reads resources without hardcoding endpoint paths
-8. prints an execution trace and final resource summary for each plan
-
-The current script includes multiple AI-provided plans:
-
-- record a sales settlement from `customer -> source-evidences`
-- inspect source evidence from `customer -> account -> transaction -> source-evidence`
-- pivot back to account from `customer -> source-evidence -> transaction -> account`
-
-Run it with:
-
-```bash
-cd smart-domain
-./gradlew :demo:bootRun
-node demo/examples/accounting-agent-mvp.js
-```
 
 ## Run The Demo
 
