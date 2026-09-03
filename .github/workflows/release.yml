@@ -25,52 +25,67 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
 
       - name: Resolve release version
         id: version
+        env:
+          REQUESTED_VERSION: ${{ inputs.version }}
         shell: bash
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            VERSION="${{ inputs.version }}"
+          if [ "${GITHUB_EVENT_NAME}" = "workflow_dispatch" ]; then
+            VERSION="${REQUESTED_VERSION}"
           else
             VERSION="${GITHUB_REF_NAME#v}"
           fi
           echo "value=${VERSION}" >> "$GITHUB_OUTPUT"
 
       - name: Set up Java 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
           java-version: 17
           distribution: temurin
-          cache: gradle
 
       - name: Make Gradle wrapper executable
         run: chmod +x gradlew
 
       - name: Build release
         env:
-          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_PRIVATE_KEY }}
-          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.GPG_PASSPHRASE }}
-          ORG_GRADLE_PROJECT_centralUsername: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
-          ORG_GRADLE_PROJECT_centralPassword: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
+          RELEASE_VERSION: ${{ steps.version.outputs.value }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: >-
+            ${{ secrets.GPG_PRIVATE_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: >-
+            ${{ secrets.GPG_PASSPHRASE }}
+          ORG_GRADLE_PROJECT_centralUsername: >-
+            ${{ secrets.CENTRAL_TOKEN_USERNAME }}
+          ORG_GRADLE_PROJECT_centralPassword: >-
+            ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
         run: |
           ./gradlew \
-            -PsmartDomainVersion=${{ steps.version.outputs.value }} \
+            -PsmartDomainVersion="${RELEASE_VERSION}" \
             build
           ./gradlew \
             --no-parallel \
-            -PsmartDomainVersion=${{ steps.version.outputs.value }} \
+            -PsmartDomainVersion="${RELEASE_VERSION}" \
             publishReleaseBundle
 
       - name: Upload release bundle
         env:
+          RELEASE_VERSION: ${{ steps.version.outputs.value }}
           CENTRAL_TOKEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
           CENTRAL_TOKEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
         shell: bash
         run: |
-          VERSION="${{ steps.version.outputs.value }}"
-          AUTH=$(printf '%s:%s' "${CENTRAL_TOKEN_USERNAME}" "${CENTRAL_TOKEN_PASSWORD}" | base64 | tr -d '\n')
+          VERSION="${RELEASE_VERSION}"
+          AUTH=$(
+            printf '%s:%s' \
+              "${CENTRAL_TOKEN_USERNAME}" \
+              "${CENTRAL_TOKEN_PASSWORD}" \
+              | base64 \
+              | tr -d '\n'
+          )
           BUNDLE_ROOT="${GITHUB_WORKSPACE}/build/central-bundle/repository"
           BUNDLE_FILE="${GITHUB_WORKSPACE}/build/central-bundle/central-bundle-${VERSION}.zip"
 
@@ -84,7 +99,14 @@ jobs:
             sha1sum "${file}" | awk '{print $1}' > "${file}.sha1"
             sha256sum "${file}" | awk '{print $1}' > "${file}.sha256"
             sha512sum "${file}" | awk '{print $1}' > "${file}.sha512"
-          done < <(find "${BUNDLE_ROOT}" -type f ! -name '*.md5' ! -name '*.sha1' ! -name '*.sha256' ! -name '*.sha512' -print0)
+          done < <(
+            find "${BUNDLE_ROOT}" -type f \
+              ! -name '*.md5' \
+              ! -name '*.sha1' \
+              ! -name '*.sha256' \
+              ! -name '*.sha512' \
+              -print0
+          )
 
           rm -f "${BUNDLE_FILE}"
           (
@@ -108,7 +130,12 @@ jobs:
               --header "Authorization: Bearer ${AUTH}" \
               "https://central.sonatype.com/api/v1/publisher/status?id=${DEPLOYMENT_ID}")
             LAST_STATUS_JSON="${STATUS_JSON}"
-            STATE=$(printf '%s' "${STATUS_JSON}" | python3 -c 'import json, sys; print(json.load(sys.stdin)["deploymentState"])')
+            STATE=$(
+              printf '%s' "${STATUS_JSON}" \
+                | python3 -c \
+                  'import json,sys; state=json.load(sys.stdin);'\
+                  'print(state["deploymentState"])'
+            )
             echo "Attempt ${attempt}: deployment state is ${STATE}"
 
             if [ "${STATE}" = "PUBLISHED" ]; then
@@ -129,7 +156,8 @@ jobs:
           fi
 
           if [ "${STATE}" = "PUBLISHING" ]; then
-            echo "Central is still publishing deployment ${DEPLOYMENT_ID}. Treating this workflow as successful and allowing publication to complete asynchronously."
+            echo "Central is still publishing deployment ${DEPLOYMENT_ID}."
+            echo "Allowing publication to complete asynchronously."
             exit 0
           fi
 
