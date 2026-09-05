@@ -20,9 +20,15 @@ Read it in this order:
 The sequence is intentionally no-service: do not insert an application service between the API and
 the connected domain model.
 
+Before applying this learning example to a real project, follow the
+[Consumer Adoption Guide](./docs/adoption-guide.md): pin the documentation/version, fill the project
+association and role templates, and establish an explicit AI reading entrypoint. Check
+[compatibility](./docs/compatibility.md) before replacing any host framework or adding starters.
+
 ## 0. Download And Import Packages
 
-Most users should start with the public entrypoints:
+Select the public entrypoints needed by the project. The examples below combine the official starters
+on their supported baseline; Core-first adoption does not require either starter:
 
 - `smart-domain-bom`
 - `smart-domain-core`

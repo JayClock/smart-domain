@@ -15,9 +15,12 @@
 
 整个流程采用 No-Service 架构，不要在 API 与连通领域模型之间增加应用 Service。
 
+将学习示例用于真实项目前，按[消费者接入指南](./docs/adoption-guide.zh-CN.md)固定文档/版本、填写项目关联与角色模板，并建立明确的 AI 阅读入口。
+替换宿主框架或添加 Starter 前先检查[兼容性](./docs/compatibility.zh-CN.md)。
+
 ## 0. 下载并导入组件
 
-大多数用户从以下公共入口开始：
+选择项目需要的公共入口。下方示例在支持基线上组合官方 Starter；Core 优先接入不要求安装任何一个 Starter：
 
 - `smart-domain-bom`
 - `smart-domain-core`

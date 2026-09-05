@@ -90,6 +90,20 @@ coordinates anemic entities through repositories. See the normative
 [Association Recipes](./docs/association-recipes.md), and the
 [Anti-Patterns](./docs/anti-patterns.md).
 
+## Adopting Smart Domain In Your Project
+
+Before asking an AI agent to implement a feature, prepare a versioned project contract:
+
+1. Read the [Consumer Adoption Guide](./docs/adoption-guide.md) and [Compatibility Matrix](./docs/compatibility.md).
+2. Merge the [consumer AGENTS template](./templates/consumer-AGENTS.md) into the host's instructions.
+3. Fill the project's [association/behavior matrix](./templates/association-matrix.md) and [context roles](./templates/context-roles.md).
+4. Plan and record real checks in the [adoption checklist](./templates/adoption-checklist.md).
+
+The library owns reusable pattern rules; the consumer owns its business requirements, module map,
+ADRs and operating commands. Organize code in layers, but execute behavior through domain objects,
+not a business Service pipeline. This repository's `AGENTS.md` is for framework development and is
+not automatically read by consumers. Pin artifact and documentation revisions explicitly.
+
 ## The Core Pattern
 
 The central modeling rule is simple:
@@ -344,6 +358,10 @@ These are the primary modules intended for external adoption.
 
 ## Quick Start
 
+The full-starter examples below target the [supported baseline](./docs/compatibility.md).
+Select only needed integrations; for Core-first adoption on an existing stack, use the
+[Adoption Guide](./docs/adoption-guide.md) before changing framework versions.
+
 ### Gradle
 
 ```gradle
@@ -469,6 +487,9 @@ Use them only when you intentionally need lower-level control, such as:
 
 ## Docs
 
+- [Consumer Adoption Guide](./docs/adoption-guide.md)
+- [Compatibility Matrix](./docs/compatibility.md)
+- [Consumer AGENTS Template](./templates/consumer-AGENTS.md)
 - [Pattern Contract](./docs/pattern-contract.md)
 - [Association Recipes](./docs/association-recipes.md)
 - [Anti-Patterns](./docs/anti-patterns.md)

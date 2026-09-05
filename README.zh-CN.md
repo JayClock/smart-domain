@@ -79,6 +79,19 @@ HTTP 资源 -> 根关联 -> 实体/上下文角色 -> 关联 -> 适配器
 - [关联模式示例](./docs/association-recipes.zh-CN.md)
 - [反模式](./docs/anti-patterns.zh-CN.md)
 
+## 在你的项目中接入 Smart Domain
+
+让 AI Agent 实现功能前，先准备版本化的项目契约：
+
+1. 阅读[消费者接入指南](./docs/adoption-guide.zh-CN.md)和[兼容性矩阵](./docs/compatibility.zh-CN.md)。
+2. 将[消费者 AGENTS 模板](./templates/consumer-AGENTS.zh-CN.md)合并到宿主指令。
+3. 填写项目的[关联/行为矩阵](./templates/association-matrix.zh-CN.md)和[上下文角色](./templates/context-roles.zh-CN.md)。
+4. 在[接入检查清单](./templates/adoption-checklist.zh-CN.md)中计划并记录真实检查。
+
+框架拥有可复用模式规则；接入项目拥有业务需求、模块图、ADR 和操作命令。
+按分层组织代码，但通过领域对象执行业务，而不是建立业务 Service 流水线。
+本仓库的 `AGENTS.md` 用于框架开发，不会自动被接入项目读取。应明确固定组件与文档修订。
+
 ## 核心模式
 
 中心规则如下：
@@ -225,6 +238,9 @@ smart-domain/
 
 ## 快速开始
 
+下方完整 Starter 示例面向[支持基线](./docs/compatibility.zh-CN.md)。只选择需要的集成；
+在现有技术栈上先接入 Core 时，先阅读[接入指南](./docs/adoption-guide.zh-CN.md)，不要直接变更框架版本。
+
 ### Gradle
 
 ```gradle
@@ -255,6 +271,14 @@ dependencies {
   <dependency>
     <groupId>io.github.jayclock</groupId>
     <artifactId>smart-domain-core</artifactId>
+  </dependency>
+  <dependency>
+    <groupId>io.github.jayclock</groupId>
+    <artifactId>smart-domain-mybatis-spring-boot-starter</artifactId>
+  </dependency>
+  <dependency>
+    <groupId>io.github.jayclock</groupId>
+    <artifactId>smart-domain-api-spring-boot-starter</artifactId>
   </dependency>
 </dependencies>
 ```
@@ -309,6 +333,9 @@ dependencies {
 
 ## 文档
 
+- [消费者接入指南](./docs/adoption-guide.zh-CN.md)
+- [兼容性矩阵](./docs/compatibility.zh-CN.md)
+- [消费者 AGENTS 模板](./templates/consumer-AGENTS.zh-CN.md)
 - [模式契约](./docs/pattern-contract.zh-CN.md)
 - [关联模式示例](./docs/association-recipes.zh-CN.md)
 - [反模式](./docs/anti-patterns.zh-CN.md)
